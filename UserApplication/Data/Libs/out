@@ -1,0 +1,7 @@
+new out (new str []) //Simple str out
+{
+    for (new i = 0; str [i] != 0; i = i + 1)
+    {
+        echo str [i]; //echo each symbol
+    } 
+}

@@ -1,0 +1,2054 @@
+push 12 //Size
+add //Reserve memory for addreses
+//New variable SX
+//{
+push 1 //Size of SX
+add //Reserve memory
+popm 1 //Push Addr to SX's cell
+
+//Push value
+//{
+push 15
+
+pushm 1 //Address of SX
+popms
+//}
+//}
+
+//New variable SY
+//{
+push 1 //Size of SY
+add //Reserve memory
+popm 2 //Push Addr to SY's cell
+
+//Push value
+//{
+push 10
+
+pushm 2 //Address of SY
+popms
+//}
+//}
+
+//New arr Fild
+//{
+//Push size
+//{
+push 150
+//}
+dup
+popm 9 //Push size
+
+add //Reserve memory
+popm 8 //Push Addr to Fild's cell
+//}
+
+//New func cls
+//{
+goto 1 //End
+: 0
+//echo
+//{
+push -1
+
+@
+//}
+
+end
+: 1 //End
+//}
+//New func OK
+//{
+goto 3 //End
+: 2
+//New arr Str
+//{
+//Push size
+//{
+push 74
+//}
+dup
+popm 11 //Push size
+
+add //Reserve memory
+popm 10 //Push Addr to Str's cell
+//Push arr cell 0
+//{
+push 84
+
+pushm 10
+push  0 //i
+sum
+popms
+//}
+
+//Push arr cell 1
+//{
+push 104
+
+pushm 10
+push  1 //i
+sum
+popms
+//}
+
+//Push arr cell 2
+//{
+push 105
+
+pushm 10
+push  2 //i
+sum
+popms
+//}
+
+//Push arr cell 3
+//{
+push 115
+
+pushm 10
+push  3 //i
+sum
+popms
+//}
+
+//Push arr cell 4
+//{
+push 32
+
+pushm 10
+push  4 //i
+sum
+popms
+//}
+
+//Push arr cell 5
+//{
+push 112
+
+pushm 10
+push  5 //i
+sum
+popms
+//}
+
+//Push arr cell 6
+//{
+push 114
+
+pushm 10
+push  6 //i
+sum
+popms
+//}
+
+//Push arr cell 7
+//{
+push 111
+
+pushm 10
+push  7 //i
+sum
+popms
+//}
+
+//Push arr cell 8
+//{
+push 103
+
+pushm 10
+push  8 //i
+sum
+popms
+//}
+
+//Push arr cell 9
+//{
+push 114
+
+pushm 10
+push  9 //i
+sum
+popms
+//}
+
+//Push arr cell 10
+//{
+push 97
+
+pushm 10
+push  10 //i
+sum
+popms
+//}
+
+//Push arr cell 11
+//{
+push 109
+
+pushm 10
+push  11 //i
+sum
+popms
+//}
+
+//Push arr cell 12
+//{
+push 32
+
+pushm 10
+push  12 //i
+sum
+popms
+//}
+
+//Push arr cell 13
+//{
+push 97
+
+pushm 10
+push  13 //i
+sum
+popms
+//}
+
+//Push arr cell 14
+//{
+push 114
+
+pushm 10
+push  14 //i
+sum
+popms
+//}
+
+//Push arr cell 15
+//{
+push 101
+
+pushm 10
+push  15 //i
+sum
+popms
+//}
+
+//Push arr cell 16
+//{
+push 32
+
+pushm 10
+push  16 //i
+sum
+popms
+//}
+
+//Push arr cell 17
+//{
+push 110
+
+pushm 10
+push  17 //i
+sum
+popms
+//}
+
+//Push arr cell 18
+//{
+push 111
+
+pushm 10
+push  18 //i
+sum
+popms
+//}
+
+//Push arr cell 19
+//{
+push 110
+
+pushm 10
+push  19 //i
+sum
+popms
+//}
+
+//Push arr cell 20
+//{
+push 45
+
+pushm 10
+push  20 //i
+sum
+popms
+//}
+
+//Push arr cell 21
+//{
+push 115
+
+pushm 10
+push  21 //i
+sum
+popms
+//}
+
+//Push arr cell 22
+//{
+push 116
+
+pushm 10
+push  22 //i
+sum
+popms
+//}
+
+//Push arr cell 23
+//{
+push 111
+
+pushm 10
+push  23 //i
+sum
+popms
+//}
+
+//Push arr cell 24
+//{
+push 112
+
+pushm 10
+push  24 //i
+sum
+popms
+//}
+
+//Push arr cell 25
+//{
+push 46
+
+pushm 10
+push  25 //i
+sum
+popms
+//}
+
+//Push arr cell 26
+//{
+push 10
+
+pushm 10
+push  26 //i
+sum
+popms
+//}
+
+//Push arr cell 27
+//{
+push 68
+
+pushm 10
+push  27 //i
+sum
+popms
+//}
+
+//Push arr cell 28
+//{
+push 111
+
+pushm 10
+push  28 //i
+sum
+popms
+//}
+
+//Push arr cell 29
+//{
+push 32
+
+pushm 10
+push  29 //i
+sum
+popms
+//}
+
+//Push arr cell 30
+//{
+push 121
+
+pushm 10
+push  30 //i
+sum
+popms
+//}
+
+//Push arr cell 31
+//{
+push 111
+
+pushm 10
+push  31 //i
+sum
+popms
+//}
+
+//Push arr cell 32
+//{
+push 117
+
+pushm 10
+push  32 //i
+sum
+popms
+//}
+
+//Push arr cell 33
+//{
+push 32
+
+pushm 10
+push  33 //i
+sum
+popms
+//}
+
+//Push arr cell 34
+//{
+push 119
+
+pushm 10
+push  34 //i
+sum
+popms
+//}
+
+//Push arr cell 35
+//{
+push 97
+
+pushm 10
+push  35 //i
+sum
+popms
+//}
+
+//Push arr cell 36
+//{
+push 110
+
+pushm 10
+push  36 //i
+sum
+popms
+//}
+
+//Push arr cell 37
+//{
+push 116
+
+pushm 10
+push  37 //i
+sum
+popms
+//}
+
+//Push arr cell 38
+//{
+push 32
+
+pushm 10
+push  38 //i
+sum
+popms
+//}
+
+//Push arr cell 39
+//{
+push 116
+
+pushm 10
+push  39 //i
+sum
+popms
+//}
+
+//Push arr cell 40
+//{
+push 111
+
+pushm 10
+push  40 //i
+sum
+popms
+//}
+
+//Push arr cell 41
+//{
+push 32
+
+pushm 10
+push  41 //i
+sum
+popms
+//}
+
+//Push arr cell 42
+//{
+push 99
+
+pushm 10
+push  42 //i
+sum
+popms
+//}
+
+//Push arr cell 43
+//{
+push 111
+
+pushm 10
+push  43 //i
+sum
+popms
+//}
+
+//Push arr cell 44
+//{
+push 110
+
+pushm 10
+push  44 //i
+sum
+popms
+//}
+
+//Push arr cell 45
+//{
+push 116
+
+pushm 10
+push  45 //i
+sum
+popms
+//}
+
+//Push arr cell 46
+//{
+push 105
+
+pushm 10
+push  46 //i
+sum
+popms
+//}
+
+//Push arr cell 47
+//{
+push 110
+
+pushm 10
+push  47 //i
+sum
+popms
+//}
+
+//Push arr cell 48
+//{
+push 117
+
+pushm 10
+push  48 //i
+sum
+popms
+//}
+
+//Push arr cell 49
+//{
+push 101
+
+pushm 10
+push  49 //i
+sum
+popms
+//}
+
+//Push arr cell 50
+//{
+push 32
+
+pushm 10
+push  50 //i
+sum
+popms
+//}
+
+//Push arr cell 51
+//{
+push 40
+
+pushm 10
+push  51 //i
+sum
+popms
+//}
+
+//Push arr cell 52
+//{
+push 116
+
+pushm 10
+push  52 //i
+sum
+popms
+//}
+
+//Push arr cell 53
+//{
+push 105
+
+pushm 10
+push  53 //i
+sum
+popms
+//}
+
+//Push arr cell 54
+//{
+push 112
+
+pushm 10
+push  54 //i
+sum
+popms
+//}
+
+//Push arr cell 55
+//{
+push 32
+
+pushm 10
+push  55 //i
+sum
+popms
+//}
+
+//Push arr cell 56
+//{
+push 89
+
+pushm 10
+push  56 //i
+sum
+popms
+//}
+
+//Push arr cell 57
+//{
+push 40
+
+pushm 10
+push  57 //i
+sum
+popms
+//}
+
+//Push arr cell 58
+//{
+push 121
+
+pushm 10
+push  58 //i
+sum
+popms
+//}
+
+//Push arr cell 59
+//{
+push 101
+
+pushm 10
+push  59 //i
+sum
+popms
+//}
+
+//Push arr cell 60
+//{
+push 115
+
+pushm 10
+push  60 //i
+sum
+popms
+//}
+
+//Push arr cell 61
+//{
+push 41
+
+pushm 10
+push  61 //i
+sum
+popms
+//}
+
+//Push arr cell 62
+//{
+push 32
+
+pushm 10
+push  62 //i
+sum
+popms
+//}
+
+//Push arr cell 63
+//{
+push 111
+
+pushm 10
+push  63 //i
+sum
+popms
+//}
+
+//Push arr cell 64
+//{
+push 114
+
+pushm 10
+push  64 //i
+sum
+popms
+//}
+
+//Push arr cell 65
+//{
+push 32
+
+pushm 10
+push  65 //i
+sum
+popms
+//}
+
+//Push arr cell 66
+//{
+push 78
+
+pushm 10
+push  66 //i
+sum
+popms
+//}
+
+//Push arr cell 67
+//{
+push 40
+
+pushm 10
+push  67 //i
+sum
+popms
+//}
+
+//Push arr cell 68
+//{
+push 110
+
+pushm 10
+push  68 //i
+sum
+popms
+//}
+
+//Push arr cell 69
+//{
+push 111
+
+pushm 10
+push  69 //i
+sum
+popms
+//}
+
+//Push arr cell 70
+//{
+push 41
+
+pushm 10
+push  70 //i
+sum
+popms
+//}
+
+//Push arr cell 71
+//{
+push 41
+
+pushm 10
+push  71 //i
+sum
+popms
+//}
+
+//Push arr cell 72
+//{
+push 63
+
+pushm 10
+push  72 //i
+sum
+popms
+//}
+
+//Push arr cell 73
+//{
+push 0
+
+pushm 10
+push  73 //i
+sum
+popms
+//}
+
+//}
+
+//For
+//{
+//Variables
+//{
+//New variable i
+//{
+push 1 //Size of i
+add //Reserve memory
+popm 3 //Push Addr to i's cell
+
+//Push value
+//{
+push 0
+
+pushm 3 //Address of i
+popms
+//}
+//}
+
+//}
+goto 16
+: 14
+//Dynamic
+//{
+//Equal
+//{
+//What
+pushm 3 //Address i
+pushms
+
+push 1
+sum
+//Whoom
+pushm 3 //Adress of i
+popms
+//}
+//}
+: 16
+//Equation
+//{
+push 0
+//Push arr cell
+//{
+pushm 10 //Adress Str
+//Str index
+pushm 3 //Address i
+pushms
+
+sum
+pushms //Str
+//}
+
+equal
+not
+//}
+ifnot 15 
+//echo
+//{
+//Push arr cell
+//{
+pushm 10 //Adress Str
+//Str index
+pushm 3 //Address i
+pushms
+
+sum
+pushms //Str
+//}
+
+
+@
+//}
+
+goto 14
+: 15
+//Delete var
+//{
+push 1 //Size
+pushm 3 //Address
+rem
+//}
+//}
+//New variable Answer
+//{
+push 1 //Size of Answer
+add //Reserve memory
+popm 3 //Push Addr to Answer's cell
+//}
+
+//Get
+//{
+&
+
+pushm 3 //Adress of Answer
+popms
+//}
+//If
+//{
+//Equation
+//{
+//AND
+//{
+push 89
+pushm 3 //Address Answer
+pushms
+
+equal
+not
+dup
+ifnot 18
+push 121
+pushm 3 //Address Answer
+pushms
+
+equal
+not
+mul
+: 18
+//}
+//}
+ifnot 17
+//Return
+//{
+push 0
+popm 0
+
+//Pop function memory
+//{
+//Delete var
+//{
+push 1 //Size
+pushm 3 //Address
+rem
+//}
+//}
+
+end
+//}
+: 17 //End
+//}
+//Return
+//{
+push 1
+popm 0
+
+//Pop function memory
+//{
+//Delete var
+//{
+push 1 //Size
+pushm 3 //Address
+rem
+//}
+//}
+
+end
+//}
+//Delete var
+//{
+push 1 //Size
+pushm 3 //Address
+rem
+//}
+end
+: 3 //End
+//}
+//New func GetCoord
+//{
+goto 5 //End
+: 4
+down 2 //Down return pointer
+//Pop function params
+//{
+push 1 //Size of y
+add //Reserve memory
+popm 4 //Push Addr to y's cell
+pushm 4 //Push Addr to y's cell
+popms
+push 1 //Size of x
+add //Reserve memory
+popm 3 //Push Addr to x's cell
+pushm 3 //Push Addr to x's cell
+popms
+//}
+//Return
+//{
+pushm 4 //Address y
+pushms
+
+pushm 1 //Address SX
+pushms
+
+mul
+pushm 3 //Address x
+pushms
+
+sum
+popm 0
+
+//Pop function memory
+//{
+//Delete var
+//{
+push 1 //Size
+pushm 3 //Address
+rem
+//}
+//Delete var
+//{
+push 1 //Size
+pushm 4 //Address
+rem
+//}
+//}
+
+end
+//}
+//Delete var
+//{
+push 1 //Size
+pushm 3 //Address
+rem
+//}
+//Delete var
+//{
+push 1 //Size
+pushm 4 //Address
+rem
+//}
+end
+: 5 //End
+//}
+//New func DrawFild
+//{
+goto 7 //End
+: 6
+//Call function cls
+//{
+//Push memory
+//{
+//}
+call 0
+//Pop memory
+//{
+//}
+//}
+//For
+//{
+//Variables
+//{
+//New variable i
+//{
+push 1 //Size of i
+add //Reserve memory
+popm 3 //Push Addr to i's cell
+
+//Push value
+//{
+push -1
+
+pushm 3 //Address of i
+popms
+//}
+//}
+
+//}
+goto 21
+: 19
+//Dynamic
+//{
+//Equal
+//{
+//What
+pushm 3 //Address i
+pushms
+
+push 1
+sum
+//Whoom
+pushm 3 //Adress of i
+popms
+//}
+//}
+: 21
+//Equation
+//{
+//Less or equal
+//{
+pushm 1 //Address SX
+pushms
+
+dup
+
+pushm 3 //Address i
+pushms
+
+dup
+down 2
+
+less
+down 2
+equal
+
+sum
+push 0
+less
+//}
+//}
+ifnot 20 
+//echo
+//{
+push 45
+
+@
+//}
+
+goto 19
+: 20
+//Delete var
+//{
+push 1 //Size
+pushm 3 //Address
+rem
+//}
+//}
+//echo
+//{
+push 10
+
+@
+//}
+
+//For
+//{
+//Variables
+//{
+//New variable y
+//{
+push 1 //Size of y
+add //Reserve memory
+popm 3 //Push Addr to y's cell
+
+//Push value
+//{
+push 0
+
+pushm 3 //Address of y
+popms
+//}
+//}
+
+//}
+goto 24
+: 22
+//Dynamic
+//{
+//Equal
+//{
+//What
+pushm 3 //Address y
+pushms
+
+push 1
+sum
+//Whoom
+pushm 3 //Adress of y
+popms
+//}
+//}
+: 24
+//Equation
+//{
+pushm 2 //Address SY
+pushms
+
+pushm 3 //Address y
+pushms
+
+less
+//}
+ifnot 23 
+//echo
+//{
+push 124
+
+@
+//}
+
+//For
+//{
+//Variables
+//{
+//New variable x
+//{
+push 1 //Size of x
+add //Reserve memory
+popm 4 //Push Addr to x's cell
+
+//Push value
+//{
+push 0
+
+pushm 4 //Address of x
+popms
+//}
+//}
+
+//}
+goto 27
+: 25
+//Dynamic
+//{
+//Equal
+//{
+//What
+pushm 4 //Address x
+pushms
+
+push 1
+sum
+//Whoom
+pushm 4 //Adress of x
+popms
+//}
+//}
+: 27
+//Equation
+//{
+pushm 1 //Address SX
+pushms
+
+pushm 4 //Address x
+pushms
+
+less
+//}
+ifnot 26 
+//If
+//{
+//Equation
+//{
+push 0
+//Push arr cell
+//{
+pushm 8 //Adress Fild
+//Fild index
+//Call function GetCoord
+//{
+//Push memory
+//{
+pushm 4
+pushm 3
+//}
+//Push function params
+//{
+//Push instace
+//{
+pushm 4 //Address x
+pushms
+
+//}
+//Push instace
+//{
+pushm 3 //Address y
+pushms
+
+//}
+//}
+call 4
+//Pop memory
+//{
+popm 3
+popm 4
+//}
+//}
+pushm 0 //return value
+sum
+pushms //Fild
+//}
+
+equal
+//}
+ifnot 28
+//echo
+//{
+push 32
+
+@
+//}
+
+goto 29 //End
+//Else
+//{
+: 28
+//echo
+//{
+push 64
+
+@
+//}
+
+//}
+: 29 //End
+//}
+goto 25
+: 26
+//Delete var
+//{
+push 1 //Size
+pushm 4 //Address
+rem
+//}
+//}
+//echo
+//{
+push 124
+
+@
+//}
+
+//echo
+//{
+push 10
+
+@
+//}
+
+goto 22
+: 23
+//}
+//For
+//{
+//Variables
+//{
+//New variable i
+//{
+push 1 //Size of i
+add //Reserve memory
+popm 3 //Push Addr to i's cell
+
+//Push value
+//{
+push -1
+
+pushm 3 //Address of i
+popms
+//}
+//}
+
+//}
+goto 32
+: 30
+//Dynamic
+//{
+//Equal
+//{
+//What
+pushm 3 //Address i
+pushms
+
+push 1
+sum
+//Whoom
+pushm 3 //Adress of i
+popms
+//}
+//}
+: 32
+//Equation
+//{
+//Less or equal
+//{
+pushm 1 //Address SX
+pushms
+
+dup
+
+pushm 3 //Address i
+pushms
+
+dup
+down 2
+
+less
+down 2
+equal
+
+sum
+push 0
+less
+//}
+//}
+ifnot 31 
+//echo
+//{
+push 45
+
+@
+//}
+
+goto 30
+: 31
+//Delete var
+//{
+push 1 //Size
+pushm 3 //Address
+rem
+//}
+//}
+end
+: 7 //End
+//}
+//New func ClearFild
+//{
+goto 9 //End
+: 8
+//For
+//{
+//Variables
+//{
+//New variable i
+//{
+push 1 //Size of i
+add //Reserve memory
+popm 3 //Push Addr to i's cell
+
+//Push value
+//{
+push 0
+
+pushm 3 //Address of i
+popms
+//}
+//}
+
+//}
+goto 35
+: 33
+//Dynamic
+//{
+//Equal
+//{
+//What
+pushm 3 //Address i
+pushms
+
+push 1
+sum
+//Whoom
+pushm 3 //Adress of i
+popms
+//}
+//}
+: 35
+//Equation
+//{
+pushm 1 //Address SX
+pushms
+
+pushm 2 //Address SY
+pushms
+
+mul
+pushm 3 //Address i
+pushms
+
+less
+//}
+ifnot 34 
+//Equal
+//{
+//What
+push 0
+//Whoom
+//[]
+pushm 3 //Address i
+pushms
+
+pushm 8 //Adress of Fild
+sum
+popms
+//}
+goto 33
+: 34
+//Delete var
+//{
+push 1 //Size
+pushm 3 //Address
+rem
+//}
+//}
+end
+: 9 //End
+//}
+//New func Ball
+//{
+goto 11 //End
+: 10
+//New variable BallX
+//{
+push 1 //Size of BallX
+add //Reserve memory
+popm 3 //Push Addr to BallX's cell
+
+//Push value
+//{
+push 1
+
+pushm 3 //Address of BallX
+popms
+//}
+//}
+
+//New variable BallY
+//{
+push 1 //Size of BallY
+add //Reserve memory
+popm 4 //Push Addr to BallY's cell
+
+//Push value
+//{
+push 0
+
+pushm 4 //Address of BallY
+popms
+//}
+//}
+
+//New variable vx
+//{
+push 1 //Size of vx
+add //Reserve memory
+popm 5 //Push Addr to vx's cell
+
+//Push value
+//{
+push 1
+
+pushm 5 //Address of vx
+popms
+//}
+//}
+
+//New variable vy
+//{
+push 1 //Size of vy
+add //Reserve memory
+popm 6 //Push Addr to vy's cell
+
+//Push value
+//{
+push 2
+
+pushm 6 //Address of vy
+popms
+//}
+//}
+
+//While
+//{
+: 36
+//Equation
+//{
+push 1
+//}
+ifnot 37 
+//Equal
+//{
+//What
+pushm 3 //Address BallX
+pushms
+
+pushm 5 //Address vx
+pushms
+
+sum
+//Whoom
+pushm 3 //Adress of BallX
+popms
+//}
+//Equal
+//{
+//What
+pushm 4 //Address BallY
+pushms
+
+pushm 6 //Address vy
+pushms
+
+sum
+//Whoom
+pushm 4 //Adress of BallY
+popms
+//}
+//If
+//{
+//Equation
+//{
+//More or equal
+//{
+pushm 1 //Address SX
+pushms
+
+dup
+
+pushm 3 //Address BallX
+pushms
+
+dup
+down 2
+
+more
+down 2
+equal
+
+sum
+push 0
+less
+//}
+//}
+ifnot 38
+//Equal
+//{
+//What
+pushm 1 //Address SX
+pushms
+
+push 1
+swap
+sub
+//Whoom
+pushm 3 //Adress of BallX
+popms
+//}
+//Equal
+//{
+//What
+pushm 5 //Address vx
+pushms
+
+push -1
+mul
+//Whoom
+pushm 5 //Adress of vx
+popms
+//}
+: 38 //End
+//}
+//If
+//{
+//Equation
+//{
+//More or equal
+//{
+pushm 2 //Address SY
+pushms
+
+dup
+
+pushm 4 //Address BallY
+pushms
+
+dup
+down 2
+
+more
+down 2
+equal
+
+sum
+push 0
+less
+//}
+//}
+ifnot 39
+//Equal
+//{
+//What
+pushm 2 //Address SY
+pushms
+
+push 1
+swap
+sub
+//Whoom
+pushm 4 //Adress of BallY
+popms
+//}
+//Equal
+//{
+//What
+pushm 6 //Address vy
+pushms
+
+push -1
+mul
+//Whoom
+pushm 6 //Adress of vy
+popms
+//}
+: 39 //End
+//}
+//If
+//{
+//Equation
+//{
+push 0
+pushm 3 //Address BallX
+pushms
+
+less
+//}
+ifnot 40
+//Equal
+//{
+//What
+push 0
+//Whoom
+pushm 3 //Adress of BallX
+popms
+//}
+//Equal
+//{
+//What
+pushm 5 //Address vx
+pushms
+
+push -1
+mul
+//Whoom
+pushm 5 //Adress of vx
+popms
+//}
+: 40 //End
+//}
+//If
+//{
+//Equation
+//{
+push 0
+pushm 4 //Address BallY
+pushms
+
+less
+//}
+ifnot 41
+//Equal
+//{
+//What
+push 0
+//Whoom
+pushm 4 //Adress of BallY
+popms
+//}
+//Equal
+//{
+//What
+pushm 6 //Address vy
+pushms
+
+push -1
+mul
+//Whoom
+pushm 6 //Adress of vy
+popms
+//}
+: 41 //End
+//}
+//Call function ClearFild
+//{
+//Push memory
+//{
+pushm 6
+pushm 5
+pushm 4
+pushm 3
+//}
+call 8
+//Pop memory
+//{
+popm 3
+popm 4
+popm 5
+popm 6
+//}
+//}
+//Equal
+//{
+//What
+push 1
+//Whoom
+//[]
+//Call function GetCoord
+//{
+//Push memory
+//{
+pushm 6
+pushm 5
+pushm 4
+pushm 3
+//}
+//Push function params
+//{
+//Push instace
+//{
+pushm 3 //Address BallX
+pushms
+
+//}
+//Push instace
+//{
+pushm 4 //Address BallY
+pushms
+
+//}
+//}
+call 4
+//Pop memory
+//{
+popm 3
+popm 4
+popm 5
+popm 6
+//}
+//}
+pushm 0 //return value
+pushm 8 //Adress of Fild
+sum
+popms
+//}
+//Call function DrawFild
+//{
+//Push memory
+//{
+pushm 6
+pushm 5
+pushm 4
+pushm 3
+//}
+call 6
+//Pop memory
+//{
+popm 3
+popm 4
+popm 5
+popm 6
+//}
+//}
+//For
+//{
+//Variables
+//{
+//New variable i
+//{
+push 1 //Size of i
+add //Reserve memory
+popm 7 //Push Addr to i's cell
+
+//Push value
+//{
+push 0
+
+pushm 7 //Address of i
+popms
+//}
+//}
+
+//}
+goto 44
+: 42
+//Dynamic
+//{
+//Equal
+//{
+//What
+pushm 7 //Address i
+pushms
+
+push 0.1
+sum
+//Whoom
+pushm 7 //Adress of i
+popms
+//}
+//}
+: 44
+//Equation
+//{
+push 25000
+pushm 7 //Address i
+pushms
+
+less
+//}
+ifnot 43 
+goto 42
+: 43
+//Delete var
+//{
+push 1 //Size
+pushm 7 //Address
+rem
+//}
+//}
+goto 36
+: 37
+//}
+//Delete var
+//{
+push 1 //Size
+pushm 6 //Address
+rem
+//}
+//Delete var
+//{
+push 1 //Size
+pushm 3 //Address
+rem
+//}
+end
+: 11 //End
+//}
+//New func main
+//{
+goto 13 //End
+: 12
+//If
+//{
+//Equation
+//{
+//Call function OK
+//{
+//Push memory
+//{
+//}
+call 2
+//Pop memory
+//{
+//}
+//}
+pushm 0 //return value
+not
+//}
+ifnot 45
+//Return
+//{
+push -1
+popm 0
+
+//Pop function memory
+//{
+//}
+
+end
+//}
+: 45 //End
+//}
+//Call function cls
+//{
+//Push memory
+//{
+//}
+call 0
+//Pop memory
+//{
+//}
+//}
+//Call function Ball
+//{
+//Push memory
+//{
+//}
+call 10
+//Pop memory
+//{
+//}
+//}
+//Return
+//{
+push 0
+popm 0
+
+//Pop function memory
+//{
+//}
+
+end
+//}
+end
+: 13 //End
+//Main special
+//{
+call 12 // Call main :)
+
+//Delete arr
+//{
+pushm 9 //Size
+pushm 8 //Address
+rem
+//}
+//Delete var
+//{
+push 1 //Size
+pushm 2 //Address
+rem
+//}
+//Delete var
+//{
+push 1 //Size
+pushm 1 //Address
+rem
+//}
+
+goto -1 //End of programm
+//}
+//}
+//Delete arr
+//{
+pushm 9 //Size
+pushm 8 //Address
+rem
+//}
+//Delete var
+//{
+push 1 //Size
+pushm 2 //Address
+rem
+//}
+//Delete var
+//{
+push 1 //Size
+pushm 1 //Address
+rem
+//}
+: -1 //End of programm! 
+push 12 //Size
+swap //Addr must be first
+rem //Free memory for addreses

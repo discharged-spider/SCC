@@ -1,0 +1,46 @@
+new NumOut (new Num)
+{
+    if (Num < 0)
+    {
+        echo '-';
+        Num = Num * -1;
+    }
+ 
+    if (Num < 10)
+    {
+        echo Num + '0';
+        return 0;
+    }
+
+    new T = Num;
+    while (T >= 1)
+    {
+        T = T / 10;
+    }
+    while (Num - T > Num % 10)
+    {
+       T = T * 10;
+       echo T % 10 + '0'; 
+    }
+
+    T = T % 10;
+}
+
+new Factorial (new n)
+{
+    if (n < 1) return -1;
+    if (n == 1) return 1;
+
+    return n * Factorial (n - 1);
+}
+
+for (new i = 2; i < 10; i = i + 1)
+{
+    NumOut (i);
+    echo '!;
+    echo ' ;
+    echo '=;
+    echo ' ;
+    NumOut (Factorial (i));
+    echo '\n;
+}

@@ -1,0 +1,1 @@
+..\..\SCC\SCC.exe %1 -o Program.scc_asm

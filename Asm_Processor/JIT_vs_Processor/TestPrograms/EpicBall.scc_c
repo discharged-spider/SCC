@@ -1,0 +1,108 @@
+new SX = 15;
+new SY = 10;
+new Fild [150];
+
+new cls ()
+{
+    echo -1;
+}
+
+new OK ()
+{
+    new Str [] = "This program are non-stop.\nDo you want to continue (tip Y(yes) or N(no))?"
+
+    for (new i = 0; Str [i] != 0; i = i + 1)
+    {
+        echo Str [i];
+    }
+
+    new Answer;
+    get Answer;
+
+    if (Answer != 'Y' && Answer != 'y') return 0;
+
+    return 1; 
+}
+
+new GetCoord (new x, new y)
+{
+    return y * SX + x;
+}
+
+new DrawFild ()
+{
+    cls ();
+
+    for (new i = -1; i <= SX; i = i + 1) echo '-';
+    echo '\n';
+    for (new y = 0; y < SY; y = y + 1)
+    {
+        echo '|';
+        for (new x = 0; x < SX; x = x + 1)
+        {
+            if (Fild [GetCoord (x, y)] == 0) echo ' ';
+            else                             echo '@';
+        }
+        echo '|';
+        echo '\n;
+    }
+    for (new i = -1; i <= SX; i = i + 1) echo '-';
+}
+
+new ClearFild ()
+{
+    for (new i = 0; i < SX * SY; i = i + 1)
+    {
+        Fild [i] = 0;
+    } 
+}
+
+new Ball ()
+{
+    new BallX = 1, BallY = 0;
+    new vx = 1, vy = 2;
+
+    while (true)
+    {
+        BallX = BallX + vx;
+        BallY = BallY + vy;
+
+        if (BallX >= SX)
+        {       
+            BallX = SX - 1;
+            vx = -vx;
+        }
+        if (BallY >= SY)
+        {       
+            BallY = SY - 1;
+            vy = -vy;
+        }
+        if (BallX < 0)
+        {       
+            BallX = 0;
+            vx = -vx;
+        }
+        if (BallY < 0)
+        {       
+            BallY = 0;
+            vy = -vy;
+        }
+
+        ClearFild ();
+        Fild [GetCoord (BallX, BallY)] = 1;
+
+        DrawFild ();
+        for (new i = 0; i < 100000 / 4; i = i + 0.1) {};
+    }
+}
+
+new main ()
+{
+    if (!OK ()) return -1;
+
+    cls ();
+
+    Ball ();
+    
+    return 0;
+}

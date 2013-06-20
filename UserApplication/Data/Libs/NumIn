@@ -1,0 +1,11 @@
+new NumIn (new& Num)
+{
+    Num = 0;
+    new c = 0;
+    get c;
+    while (c != '\n')
+    {
+        Num = Num * 10 + c - '0';
+        get c;
+    }
+}

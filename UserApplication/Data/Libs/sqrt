@@ -1,0 +1,15 @@
+new sqrt (new Num)
+{
+    if (Num == 0) return 0;
+    if (Num < 0) return -1;
+  
+    new Result = Num, LastResult = -1;
+
+    while (true)
+    {
+        LastResult = Result;
+        Result = (Num / Result + Result) / 2;
+
+        if (LastResult == Result) return Result;
+    }
+}

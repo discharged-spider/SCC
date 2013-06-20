@@ -1,0 +1,27 @@
+new NumOut (new Num)
+{
+    if (Num < 0)
+    {
+        echo '-';
+        Num = Num * -1;
+    }
+ 
+    if (Num < 10)
+    {
+        echo Num + '0';
+        return 0;
+    }
+
+    new T = Num;
+    while (T >= 1)
+    {
+        T = T / 10;
+    }
+    while (Num - T > Num % 10)
+    {
+       T = T * 10;
+       echo T % 10 + '0'; 
+    }
+
+    T = T % 10;
+}
