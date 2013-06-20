@@ -1,0 +1,20 @@
+(  ____ \(  ____ \(  ____ \
+| (    \/| (    \/| (    \/
+| (_____ | |      | |      
+(_____  )| |      | |      
+      ) || |      | |      
+/\____) || (____/\| (____/\
+\_______)(_______/(_______/
+
+Small Compiler Collection
+
+Use Doxygen to create a documentation
+
+Languages:
+SCC_C - C-like script language
+SCC_ASM - Asm
+SCC_Shakespeare - Shakespeare modificaton, look documentation
+
+Processors:
+scc_exe files - for soft-processor
+scc_bin files - for JIT processor
