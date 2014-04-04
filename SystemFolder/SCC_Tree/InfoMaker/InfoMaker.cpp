@@ -1,5 +1,5 @@
 #define PROGRAM_NAME "SCC_Tree_InfoMaker"
-#define TREE_VERSION 8
+#define TREE_VERSION 9
 
 #include "InfoMaker.h"
 

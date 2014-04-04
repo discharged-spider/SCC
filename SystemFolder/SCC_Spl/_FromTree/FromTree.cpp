@@ -1,5 +1,5 @@
 #define PROGRAM_NAME "SCC_Tree_To_Shakespear"
-#define TREE_VERSION 8
+#define TREE_VERSION 9
 
 #include "..\\..\\_SystemLibs\\ConsoleApp\\ConsoleApp.h"
 
@@ -116,6 +116,7 @@ int main (int ArgN, char** ARG)
         fclose (InputInfo);
 
         if (Info.ArrNumber > 0) throw TH_ERROR "Arrs not support, sorry. :(");
+        if (Info.UseNatives) throw TH_ERROR "Use natives?");
 
         CreateShekspear (Output, Tree, Info, NodeInfo, Way);
         fclose (Output);

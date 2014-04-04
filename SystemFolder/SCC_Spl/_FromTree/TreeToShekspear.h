@@ -1925,6 +1925,18 @@ void For (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& N
 void NewFunc (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& NodeInfo, newTreeToShekspearData& ShData)
 {
     Tree.PushP ();
+
+    if (NodeInfo [Tree.CurrentNode ()].Addr == -2) throw TH_ERROR "Use natives?");
+
+    if (!Tree.CanDownR()) Tree.CurrentNode(NodeInfo [Tree.CurrentNode ()].Addr);
+
+    if (NodeInfo [Tree.CurrentNode ()].Addr == -1)
+    {
+        Tree.PopP();
+
+        return;
+    }
+
     Tree.CurrentNode (NodeInfo [Tree.CurrentNode ()].Addr);
 
     if (strcmp (Tree.Get ().Name, "main") != 0)
@@ -1954,6 +1966,8 @@ void NewFunc (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo
     ShData.UseScenes = false;
 
     AddAct (To, ShData);
+
+    NodeInfo [Tree.CurrentNode ()].Addr = -1;
 
     Tree.PopP ();
 }

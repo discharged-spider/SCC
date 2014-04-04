@@ -1,5 +1,5 @@
 #define PROGRAM_NAME "SCC_Shakespear_To_Tree"
-#define TREE_VERSION 8
+#define TREE_VERSION 9
 
 //#define INFO_DEBUG
 //#define PAUSE

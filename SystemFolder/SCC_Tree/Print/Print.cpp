@@ -1,5 +1,5 @@
 #define PROGRAM_NAME "SCC_Tree_Print"
-#define TREE_VERSION 8
+#define TREE_VERSION 9
 #define BeautifulDot
 #define __DOT__ "PLEASE_DONT_USE"
 

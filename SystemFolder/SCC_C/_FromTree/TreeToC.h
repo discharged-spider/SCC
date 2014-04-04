@@ -77,10 +77,11 @@ void CreateNode (newTree& Tree, FILE* To, int ind)
 
     newNodeData Data = Tree.Get ();
 
-    if (Data.Descriptor == N_NEW)
+    if (Data.Descriptor == N_NEW || Data.Descriptor == N_NATIVE)
     {
         PrintInd (To, ind);
-        fprintf (To, "new ");
+        if (Data.Descriptor == N_NEW) fprintf (To, "new ");
+        else                          fprintf (To, "native ");
 
         Tree.DownL ();
         bool EndSymbol = New (Tree, To, ind);

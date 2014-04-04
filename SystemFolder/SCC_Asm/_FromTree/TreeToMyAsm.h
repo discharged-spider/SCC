@@ -107,6 +107,12 @@ void CreateAsmRec (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNod
 
         return ;
     }
+    if (Data.Descriptor == N_NATIVE)
+    {
+        New (To, Tree, Info, NodeInfo, AsmData);
+
+        return ;
+    }
 
     if (Data.Descriptor == N_EQ)
     {
@@ -957,47 +963,48 @@ void NewFunc (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo
 
 void CallFunc (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& NodeInfo, newTreeToMyAsmData& AsmData)
 {
-   //printf ("CallFunc\n");
-   newNodeData Data = Tree.Get ();
+    //printf ("CallFunc\n");
+    newNodeData Data = Tree.Get ();
 
-   fprintf (To, "//Call function %s\n", Data.Name);
-   fprintf (To, "//{\n");
+    fprintf (To, "//Call function %s\n", Data.Name);
+    fprintf (To, "//{\n");
 
-   printf ("Name = %s\n", Data.Name);
+    printf ("Name = %s\n", Data.Name);
 
-   AsmData.MC.PrintfPush (To, NodeInfo[Tree.CurrentNode()].ID);
+    AsmData.MC.PrintfPush (To, NodeInfo[Tree.CurrentNode()].ID);
 
-   if (Tree.CanDownL ())
-   {
-       Tree.DownL ();
+    if (Tree.CanDownL ())
+    {
+        Tree.DownL ();
 
-       fprintf (To, "//Push function params\n");
-       fprintf (To, "//{\n");
+        fprintf (To, "//Push function params\n");
+        fprintf (To, "//{\n");
 
-       AsmData.ArrsToDelete = 0;
-       int i = 0;
-       PushParams (To, Tree, Info, NodeInfo, AsmData, i);
+        AsmData.ArrsToDelete = 0;
+        int i = 0;
+        PushParams (To, Tree, Info, NodeInfo, AsmData, i);
 
-       fprintf (To, "//}\n");
+        fprintf (To, "//}\n");
 
-       Tree.Up ();
-   }
+        Tree.Up ();
+    }
 
-   fprintf (To, "call %d\n", NodeInfo[Tree.CurrentNode()].ID * 2);
+    if (NodeInfo[Tree.CurrentNode()].Addr == -2) fprintf (To, "//NATIVE CALL! Will cause error, if function not exist\n");
+    fprintf (To, "call %d\n", NodeInfo[Tree.CurrentNode()].ID * 2);
 
-   if (AsmData.ArrsToDelete > 0)
-   {
-       while (AsmData.ArrsToDelete > 0)
-       {
-           fprintf (To, "rem //Delete temp arrs\n");
+    if (AsmData.ArrsToDelete > 0)
+    {
+        while (AsmData.ArrsToDelete > 0)
+        {
+            fprintf (To, "rem //Delete temp arrs\n");
 
-           AsmData.ArrsToDelete --;
-       }
-   }
+            AsmData.ArrsToDelete --;
+        }
+    }
 
-   AsmData.MC.PrintfPop (To, NodeInfo[Tree.CurrentNode()].ID);
+    AsmData.MC.PrintfPop (To, NodeInfo[Tree.CurrentNode()].ID);
 
-   fprintf (To, "//}\n");
+    fprintf (To, "//}\n");
 }
 
 void PushParams (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& NodeInfo, newTreeToMyAsmData& AsmData, int& i)
@@ -1020,7 +1027,7 @@ void PushParams (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeI
 
     if (Data.Descriptor == N_ARR)
     {
-        fprintf (To, "pushm %d //Address of arr %s", MEMORY_OFFSET_ + Info.VarMemory + 2 * NodeInfo[Tree.CurrentNode ()].Addr, Data.Name);
+        fprintf (To, "pushm %d //Address of arr %s\n", MEMORY_OFFSET_ + Info.VarMemory + 2 * NodeInfo[Tree.CurrentNode ()].Addr, Data.Name);
 
         i ++;
 

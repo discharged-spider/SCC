@@ -174,6 +174,9 @@ class newTree
     //Get current node data
     void        Set (newNodeData NodeData);
 
+    //Shows, if this tree empty
+    bool Empty ();
+
     //Return size of tree
     int Size ();
 
@@ -493,6 +496,15 @@ void newTree::Set (newNodeData NodeData)
     Data_ [CurrentNode_].Data = NodeData;
 
     assert (OK ());
+}
+
+//------------------------------------------------------------------------------
+
+bool newTree::Empty ()
+{
+    assert (OK ());
+
+    return (Size () == 1) && Get().Descriptor == N_NODE && !CanDownL() && !CanDownR();
 }
 
 //------------------------------------------------------------------------------

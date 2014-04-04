@@ -10,12 +10,13 @@
 
 #include "..\\SystemFolder\\_SystemLibs\\ConsoleApp\\ConsoleApp.h"
 
-const int TypesNumber = 4;
+const int TypesNumber = 5;
 
 enum SCC_TYPES
 {
     SCC_C,
     SCC_ASM,
+    SCC_NEW_ASM,
     SCC_SPL,
     SCC_TREE
 };
@@ -41,9 +42,9 @@ int main (int ArgN, char** ARG)
         printf ("Arguments:\n");
         printf ("[] - not requide params\n");
         printf ("input_file_name\n");
-        printf ("-i [-scc_c || -scc_asm || -scc_spl] /*input type*/\n");
+        printf ("-i [-scc_c || -scc_spl] /*input type*/\n");
         printf ("-o output_file_name (default = \"Output.txt\")\n");
-        printf ("-m [-scc_c || -scc_asm || -scc_spl] /*output type*/\n");
+        printf ("-m [-scc_c || -scc_asm || -scc_new_asm || -scc_spl] /*output type*/\n");
         printf ("-e error_output_file_name (default = \"Error.txt\")\n");
         printf ("-no - non optimaze (don't use optimizator) \n");
         exit (0);
@@ -163,6 +164,8 @@ bool CheckModules (string Way)
 
         !ModuleExist ("..\\SystemFolder\\SCC_Asm\\_FromTree\\FromTree.exe", Way) ||
 
+        !ModuleExist ("..\\SystemFolder\\SCC_New_Asm\\_FromTree\\FromTree.exe", Way) ||
+
         !ModuleExist ("..\\SystemFolder\\SCC_Tree\\Print\\Print.exe", Way) ||
         !ModuleExist ("..\\SystemFolder\\SCC_Tree\\Optimazer\\Optimazer.exe", Way) ||
         !ModuleExist ("..\\SystemFolder\\SCC_Tree\\InfoMaker\\InfoMaker.exe", Way))
@@ -175,10 +178,10 @@ bool CheckModules (string Way)
 
 int GetType (const char File [])
 {
-    int  TypesID    [TypesNumber]     = {SCC_C,   SCC_ASM,   SCC_TREE,   SCC_SPL};
-    //                                    scc_c    scc_asm    scc_tree   scc_spl
-    char TypesNames [TypesNumber][30] = {"c_ccs", "msa_ccs", "eert_ccs", "lps_ccs"};
-    bool Match      [TypesNumber]     = {true,    true,      true,       true};
+    int  TypesID    [TypesNumber]     = {SCC_C,   SCC_ASM,   SCC_NEW_ASM,   SCC_TREE,   SCC_SPL};
+    //                                    scc_c    scc_asm   scc_new_asm    scc_tree    scc_spl
+    char TypesNames [TypesNumber][30] = {"c_ccs", "msa_ccs", "msa_wen_ccs", "eert_ccs", "lps_ccs"};
+    bool Match      [TypesNumber]     = {true,    true,      true,         true,       true};
 
     int Return = -1;
 
@@ -323,6 +326,12 @@ string ComandTreeToFile (int To, const char FromName [], const char FromInfoName
 
             break;
         }
+        case (SCC_NEW_ASM):
+        {
+            Comand += "SCC_New_Asm";
+
+            break;
+        }
     };
 
     Comand += "\\_FromTree\\FromTree.exe\" ";
@@ -367,6 +376,11 @@ bool SCC_Compile (int From, int To, const char FromName [], const char ToName []
     #define TEMP_INFO "TEMP\\Temp.scc_tree_info"
 
     string Temp;
+    Temp += "If Not Exist ";
+    Temp += "\"\"";
+    Temp += Way;
+    Temp += "\"";
+    Temp += "TEMP\\*.*\" ";
     Temp += "mkdir ";
     Temp += "\"";
     Temp += Way;

@@ -18,6 +18,7 @@ struct newTreeInfo
     int ArrNumber;
     int ArrMemory;
 
+    bool UseNatives;
     int FuncNumber;
 
     int MarkNumber;
@@ -161,6 +162,7 @@ bool Link (newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& NodeInfo, 
     Info.ArrNumber      = 0;
     Info.ArrMemory      = 0;
 
+    Info.UseNatives     = false;
     Info.FuncNumber     = 0;
 
     Info.MarkNumber     = 0;
@@ -237,6 +239,30 @@ void LinkNode (newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& NodeIn
         }
 
         State = 2;
+        if (Tree.CanDownR ())
+        {
+            Tree.DownR ();
+            LinkNode (Tree, Info, NodeInfo, State, VarMID, ArrMID, FunMID, MarMID);
+            Tree.Up ();
+        }
+
+        State = 0;
+
+        return;
+    }
+    if (Data.Descriptor == N_NATIVE)
+    {
+        Info.UseNatives = true;
+
+        State = 3;
+        if (Tree.CanDownL ())
+        {
+            Tree.DownL ();
+            LinkNode (Tree, Info, NodeInfo, State, VarMID, ArrMID, FunMID, MarMID);
+            Tree.Up ();
+        }
+
+        State = 3;
         if (Tree.CanDownR ())
         {
             Tree.DownR ();
@@ -502,11 +528,13 @@ void LinkFunc (newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& NodeIn
 {
     newNodeData Data = Tree.Get ();
 
-    if (State == 1)
+    if (State == 1 || State == 3)
     {
-        if (FunMID.InFunc == true) throw TH_ERROR "Don't try to create func in func (%s)", Data.Name);
+        printf ("Add %s\n", Data.Name);
 
-        if (!Tree.CanDownR ())
+        if (State == 1 && FunMID.InFunc == true) throw TH_ERROR "Don't try to create func in func (%s)", Data.Name);
+
+        if (State == 1 && !Tree.CanDownR ())
         {
             if (FunMID.Counter.Find (Data.Name) != -1) throw TH_ERROR "This func name was already used(%s)!", Data.Name);
 
@@ -533,7 +561,9 @@ void LinkFunc (newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& NodeIn
                 ID = FunMID.Counter.Add (Data.Name);
 
                 NodeInfo [Tree.CurrentNode ()].ID = ID;
-                FunMID.Headers [ID] = Tree.CurrentNode ();
+
+                if (State == 1) FunMID.Headers [ID] = Tree.CurrentNode ();
+                else            FunMID.Headers [ID] = -2;
 
                 if (Tree.CanDownL ())
                 {
@@ -547,7 +577,9 @@ void LinkFunc (newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& NodeIn
             else
             {
                 NodeInfo [Tree.CurrentNode ()].ID = ID;
-                FunMID.Headers [ID] = Tree.CurrentNode ();
+
+                if (State == 1) FunMID.Headers [ID] = Tree.CurrentNode ();
+                else            FunMID.Headers [ID] = -2;
 
                 if (Tree.CanDownL ())
                 {
@@ -560,6 +592,8 @@ void LinkFunc (newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& NodeIn
                 }
 
             }
+
+            int StateSave = State;
 
             VarMID.Counter.PushMemory ();
             ArrMID.Counter.PushMemory ();
@@ -576,21 +610,25 @@ void LinkFunc (newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& NodeIn
             }
 
             FunMID.InParams = false;
-            FunMID.InFunc = true;
 
-            VarMID.Counter.PushMemory ();
-            ArrMID.Counter.PushMemory ();
-            FunMID.Counter.PushMemory ();
+            if (StateSave == 1)
+            {
+                FunMID.InFunc = true;
 
-            Tree.DownR ();
-            LinkNode (Tree, Info, NodeInfo, State, VarMID, ArrMID, FunMID, MarMID);
-            Tree.Up ();
+                VarMID.Counter.PushMemory ();
+                ArrMID.Counter.PushMemory ();
+                FunMID.Counter.PushMemory ();
 
-            FunMID.InFunc = false;
+                Tree.DownR ();
+                LinkNode (Tree, Info, NodeInfo, State, VarMID, ArrMID, FunMID, MarMID);
+                Tree.Up ();
 
-            VarMID.Counter.PopMemory ();
-            ArrMID.Counter.PopMemory ();
-            FunMID.Counter.PopMemory ();
+                FunMID.InFunc = false;
+
+                VarMID.Counter.PopMemory ();
+                ArrMID.Counter.PopMemory ();
+                FunMID.Counter.PopMemory ();
+            }
 
             VarMID.Counter.PopMemory ();
             ArrMID.Counter.PopMemory ();
@@ -609,15 +647,20 @@ void LinkFunc (newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& NodeIn
 
         NodeInfo [Tree.CurrentNode ()].ID = FunMID.Counter.Find (Data.Name);
 
+        int ID = NodeInfo [Tree.CurrentNode ()].ID;
+
         if (Tree.CanDownL ())
         {
-            int ID = NodeInfo [Tree.CurrentNode ()].ID;
             Tree.DownL ();
             if (!FuncParamsComp (FunMID.Params [ID], Tree, NodeInfo))  throw TH_ERROR "Function (%s) must have simular params!", Data.Name);
 
             LinkNode (Tree, Info, NodeInfo, State, VarMID, ArrMID, FunMID, MarMID);
 
             Tree.Up ();
+        }
+        else
+        {
+            if (!FunMID.Params [ID].Empty ()) throw TH_ERROR "Function (%s) must have simular params!", Data.Name);
         }
 
         return;

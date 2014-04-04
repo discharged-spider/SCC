@@ -8,10 +8,10 @@ GetAD GetAE + GetAE || GetAE - GetAE
 GetAE GetAF * GetAF || GetAF / GetAF || GetAF % GetAF
 GetAF [0-9] || GetCF || GetAF || (GetAA) || - GetAF || + GetAF || true || false || GetAG
 GetAG Name || Name[GetAA]
- 
-GetC {GetC, ...} || GetBA || GetCA || GetCB || GetCC || GetCD || GetCE || GetCF || GetCG || GetCH
 
-GetBA new GetDB || new GetDB, ...
+GetC empty || {GetC, ...} || GetBA || GetCA || GetCB || GetCC || GetCD || GetCE || GetCF || GetCG || GetCH
+
+GetBA new GetBB || new GetBB, ...
 GetBB Name || Name = GetAA || Name [GetAA] || Name [GetAA] = GetArr || &Name || Name (new GetBB, ...) {GetC; || return GetAA; ...}
 
 GetCA del Name || del Name[]
@@ -29,4 +29,7 @@ GetCF Name (GetAA || Name [] || &Name || &Name [GetAA], ...)
 GetCG echo GetAA || get GetAG
 
 GetCH : Name || goto Name
+
+GetCJ native Name (new GetBB, ...);
+
 */

@@ -514,7 +514,7 @@ void GetInfoCallGoto (FILE* Program, newShekspearData& ShData, char Str [])
 
             return;
         }
-        if (strcmp (Str, "return") != 0 && strcmp (Str, "proceed") != 0) throw TH_ERROR "Let us... I think we can oly return or proceed");
+        if (strcmp (Str, "return") != 0 && strcmp (Str, "proceed") != 0) throw TH_ERROR "Let us... I think we can only return or proceed");
         if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "And after?");
         if (strcmp (Str, "to") != 0) throw TH_ERROR "I think we can only proceed/return TO.");
         if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "To what?");

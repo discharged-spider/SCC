@@ -193,7 +193,8 @@ VectorType& newVector<VectorType>::operator [] (const int i)
     }
     assert (i > -1);
 
-    if (i >= Size_) SetSize (i + 1);
+    //if (i >= Size_) SetSize (i + 1);
+    if (i >= Size_) SetSize ((i < 10)? 10 : (i * 1.5));
 
     return *(Data_ + i);
 }

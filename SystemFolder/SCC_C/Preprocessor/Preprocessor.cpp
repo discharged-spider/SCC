@@ -1,6 +1,7 @@
 #define PROGRAM_NAME "SCC_Preprocessor"
 #define TREE_VERSION 8
 
+#include "..\\..\\_SystemLibs\\ConsoleApp\\ConsoleApp.h"
 #include "Preprocessor.h"
 #include "windows.h"
 
@@ -8,18 +9,19 @@ int main (int ArgN, char** ARG)
 {
     try
     {
-        if (ArgN != 3) throw TH_ERROR "%s: Arguments error! Arg form: InputFile Outputfile.\n");
-    
+        if (ArgN != 3) throw TH_ERROR "Arguments error! Arg form: InputFile Outputfile.\n");
+
         FILE* From = fopen (ARG [1], "rb");
         FILE* To   = fopen (ARG [2], "w+");
-        
+
         if (!From) throw TH_ERROR "No input file!");
         if (!To)   throw TH_ERROR "No output file!");
-        
-        for (int i = strlen (ARG [1]) - 1; ARG [1][i] != '\\' && i > -1; i --) ARG [1][i] = 0;
-        
-        Preprocess (From, To, ARG [1]);
-        
+
+        #define ADDR ARG [1]
+        string Way = GetMyWay (ADDR);
+
+        Preprocess (From, To, Way.c_str ());
+
         fclose (From);
         fclose (To);
     }
@@ -29,6 +31,6 @@ int main (int ArgN, char** ARG)
     }
     catch (...)
     {
-        printf ("Unknown error");      
+        printf ("Unknown error");
     }
 }

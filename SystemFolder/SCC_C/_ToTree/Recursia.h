@@ -46,6 +46,7 @@ void GetCE (newTree& Tree, newNodeData Program [], int& Size, int& i);
 void GetCF (newTree& Tree, newNodeData Program [], int& Size, int& i);
 void GetCG (newTree& Tree, newNodeData Program [], int& Size, int& i);
 void GetCH (newTree& Tree, newNodeData Program [], int& Size, int& i);
+void GetCJ (newTree& Tree, newNodeData Program [], int& Size, int& i);
 
 void GetArr (newTree& Tree, newNodeData Program [], int& Size, int& i);
 
@@ -546,7 +547,7 @@ void GetAG (newTree& Tree, newNodeData Program [], int& Size, int& i)
 }
 
 //******************************************************************************
-//GetC {GetC, ...} || GetBA || GetCA || GetCB || GetCC || GetCD || GetCE || GetCF || GetCG || GetCH
+//GetC empty || {GetC, ...} || GetBA || GetCA || GetCB || GetCC || GetCD || GetCE || GetCF || GetCG || GetCH
 void GetC (newTree& Tree, newNodeData Program [], int& Size, int& i)
 {
     #ifdef DEBUG
@@ -554,6 +555,12 @@ void GetC (newTree& Tree, newNodeData Program [], int& Size, int& i)
     #endif
 
     if (i >= Size) throw TH_ERROR "SUDDEN END");
+
+
+    if (Program [i].Descriptor == N_END)
+    {
+        return;
+    }
 
     if (Program [i].Descriptor == N_OF)
     {
@@ -720,6 +727,17 @@ void GetC (newTree& Tree, newNodeData Program [], int& Size, int& i)
         return;
     }
 
+    if (Program [i].Descriptor == N_NATIVE)
+    {
+        GetCJ (Tree, Program, Size, i);
+
+        #ifdef DEBUG
+            printf ("Return from %s, Pos = %d\n", __PRETTY_FUNCTION__, i);
+        #endif
+
+        return;
+    }
+
     if (InFunc && Program [i].Descriptor == N_RETURN)
     {
         Tree.Set (Program [i]);
@@ -841,7 +859,7 @@ void GetBA (newTree& Tree, newNodeData Program [], int& Size, int& i)
     #endif
 }
 
-//GetBB Name || Name = GetAA || Name [GetAA] || Name [GetAA] = {GetAA, ...} || &Name || Name (new GetBB, ...) = {GetC; || return GetAA; ...}
+//GetBB Name || Name = GetAA || Name [GetAA] || Name [GetAA] = {GetAA, ...} || &Name || Name (new GetBB, ...) {GetC; || return GetAA; ...}
 void GetBB (newTree& Tree, newNodeData Program [], int& Size, int& i)
 {
     #ifdef DEBUG
@@ -1623,6 +1641,107 @@ void GetCH (newTree& Tree, newNodeData Program [], int& Size, int& i)
     Tree.Set (Program [i]);
 
     Program [i].Descriptor = N_NAME;
+
+    i ++;
+
+    #ifdef DEBUG
+        printf ("Return from %s, Pos = %d\n", __PRETTY_FUNCTION__, i);
+    #endif
+}
+
+//GetCJ native Name (new GetBB, ...);
+void GetCJ (newTree& Tree, newNodeData Program [], int& Size, int& i)
+{
+    #ifdef DEBUG
+        printf ("GetCJ, Pos = %d\n", i);
+    #endif
+
+    if (i >= Size) throw TH_ERROR "SUDDEN END");
+
+    if (Program [i].Descriptor != N_NATIVE) throw TH_ERROR "Expected |native|.");
+
+    Tree.Set (Program [i]);
+
+    i ++;
+
+    if (i >= Size) throw TH_ERROR "SUDDEN END");
+
+    Tree.DownL();
+
+    if (Program [i].Descriptor != N_NAME) throw TH_ERROR "Expected |Name|.");
+
+    Program [i].Descriptor = N_FUN;
+    Tree.Set (Program [i]);
+    Program [i].Descriptor = N_NAME;
+
+    i ++;
+
+    if (i >= Size) throw TH_ERROR "SUDDEN END");
+
+    if (Program [i].Descriptor != N_OB) throw TH_ERROR "Expected |(|.");
+
+    i ++;
+
+    if (i >= Size) throw TH_ERROR "SUDDEN END");
+
+    if (Program [i].Descriptor != N_CB)
+    {
+        Tree.PushP ();
+
+        Tree.DownL ();
+
+        NullTreeNode (Tree);
+
+        Tree.Set (newNodeData (N_NODE));
+
+        Tree.DownL ();
+
+        if (Program [i].Descriptor != N_NEW) throw TH_ERROR "Expected |new|.");
+
+        Tree.Set (Program [i]);
+
+        i ++;
+
+        Tree.DownL ();
+
+        GetBB (Tree, Program, Size, i);
+
+        Tree.Up ();
+
+        while (Program [i].Descriptor != N_CB)
+        {
+            if (i >= Size) throw TH_ERROR "SUDDEN END");
+
+            if (Program [i].Descriptor != N_LIST) throw TH_ERROR "Expected |,|.");
+
+            i ++;
+
+            Tree.Up ();
+            Tree.DownR ();
+
+            Tree.Set (newNodeData (N_NODE));
+
+            Tree.DownL ();
+
+            if (Program [i].Descriptor != N_NEW) throw TH_ERROR "Expected |new|.");
+
+            Tree.Set (Program [i]);
+
+            i ++;
+
+            Tree.DownL ();
+
+            GetBB (Tree, Program, Size, i);
+
+            Tree.Up ();
+        }
+
+        if (Tree.CanUp ()) UpBranch (Tree);
+
+        Tree.PopP ();
+    }
+
+    Tree.Up();
 
     i ++;
 

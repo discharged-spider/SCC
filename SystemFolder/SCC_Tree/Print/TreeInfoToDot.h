@@ -120,6 +120,16 @@ void DrawTreeNode (FILE* To, newNode Node, newNodeInfo NodeInfo, int i)
 
             break;
         }
+        case (N_NATIVE):
+        {
+            dtNodeStyle ().fontcolor ("darkslateblue")
+                          .color     ("darkslateblue")
+                          .fillcolor ("#CCEDFF");
+
+            n -= _snprintf (Label + MaxSize - n, n, "\nNATIVE\n");
+
+            break;
+        }
 
         case (N_EQ):
         {
@@ -483,12 +493,13 @@ void DotDrawTree (FILE* To, newTree& Tree, newVector <newNodeInfo> NodeInfo, new
     fprintf (To, "Arr number  = %d\\l", Info.ArrNumber);
     fprintf (To, "Arr memory  = %d\\l", Info.ArrMemory);
 
+    fprintf (To, "Use natives = %s\\l", (Info.UseNatives)? "true" : "false");
     fprintf (To, "Func number = %d\\l", Info.FuncNumber);
 
     fprintf (To, "Mark number = %d\\l", Info.MarkNumber);
     fprintf (To, "\\l\"];\n");
 
-    fprintf (To, "            CopyRight [shape=\"plaintext\", fontsize=\"8\", label=\"(C) Danila Baygushev 2012\"];\n");
+    fprintf (To, "            CopyRight [shape=\"plaintext\", fontsize=\"8\", label=\"(C) Danila Baygushev 2012-2014\"];\n");
 
     if (Text != NULL)
     {
@@ -499,7 +510,7 @@ void DotDrawTree (FILE* To, newTree& Tree, newVector <newNodeInfo> NodeInfo, new
         while (fread (&c, 1, 1, Text) == 1)
         {
             if      (c == '\n') fprintf (To, "\\l");
-            else if (c == '\r') fprintf (To, "\\r");
+            else if (c == '\r') fprintf (To, "");
             else if (c == '\\') fprintf (To, "\\\\");
             else if (c == '"')  fprintf (To, "\\\"");
             else                fprintf (To, "%c", c);
