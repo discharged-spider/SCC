@@ -5,6 +5,7 @@
 
 #include "TreeToShekspear.h"
 #include "io.h"
+#include "time.h"
 
 int main (int ArgN, char** ARG)
 {
@@ -16,8 +17,11 @@ int main (int ArgN, char** ARG)
         printf ("-ii input_info_name (default = \"Info.scc_tree_info\")\n");
         printf ("-o output_file_name (default = \"Program.scc_spl\")\n");
         printf ("-e error_output_file_name (default = \"Error.txt\")\n");
+        printf ("-s to not use srand\n");
         exit (0);
     }
+
+    bool no_rand = false;
 
     #define ADDR ARG [0]
     string Way = GetMyWay (ADDR);
@@ -92,6 +96,12 @@ int main (int ArgN, char** ARG)
                 if (ErrorOutput) fclose (ErrorOutput);
                 ErrorOutput = fopen (ARG[i], "ab");
             }
+            if (strcmp (ARG[i], "-s") == 0)
+            {
+                i ++;
+
+                no_rand = true;
+            }
         }
 
         if (!Input) Input = fopen ("Tree.scc_tree", "rb");
@@ -103,6 +113,8 @@ int main (int ArgN, char** ARG)
         if (!Output) Output = fopen ("Program.scc_spl", "wb");
 
         if (!ErrorOutput) ErrorOutput = fopen ("Error.txt", "ab");
+
+        if (!no_rand) srand (time (NULL));
 
         newTree Tree;
 

@@ -6,6 +6,7 @@
 #include "..\..\SCC_Tree\Lib\BaseTreeDesc.h"
 #include "..\..\SCC_Tree\Lib\TreeOperations.h"
 #include "..\..\SCC_Tree\InfoMaker\InfoMaker.h"
+#include "float.h"
 #include "math.h"
 #include "Counter.h"
 #include "Help.h"
@@ -15,7 +16,7 @@
 #define T2 1 // Temp2
 #define IA 2 // Instance assist
 #define RE 3 // Return
-#define AI 4 // Arr i
+//#define AI 4 // Arr i
 #define LA 5 // Links assist
 
 #define PUSH_VAR(A) MEMORY_OFFSET_ + A
@@ -24,7 +25,7 @@
 #define PUSH_ARRS1(A) MEMORY_OFFSET_ + Info.VarMemory + 3 * (A) + 1
 #define PUSH_ARRS2(A) MEMORY_OFFSET_ + Info.VarMemory + 3 * (A) + 2
 
-#define PUSH_CHARACTER(A) AddListItem ("character", A, To, ShData.Way)
+#define PUSH_CHARACTER(A) AddListItem ("character", ShData.shuffler.shuffle (A), To, ShData.Way)
 
 struct newTreeToShekspearData;
 #include "ShMemoryCounter.h"
@@ -48,6 +49,8 @@ struct newTreeToShekspearData
     bool UseScenes;
 
     string Way;
+
+    Shuffler shuffler;
 };
 
 void CreateShekspear    (FILE* To, newTree& Tree, newTreeInfo Info, newVector <newNodeInfo> NodeInfo);
@@ -123,6 +126,8 @@ void CreateShekspear (FILE* To, newTree& Tree, newTreeInfo Info, newVector <newN
     ShData.UseScenes = false;
 
     ShData.Way = Way;
+
+    ShData.shuffler.max = ListSize ("character", Way);
 
     fprintf (To, "/*Put your name here!!!!*/\n");
     fprintf (To, "/*{\n");
@@ -331,19 +336,19 @@ void AddVars (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo
     int Size = MEMORY_OFFSET_ + Info.VarMemory + 3 * Info.ArrMemory;
 
     PUSH_CHARACTER(T1);
-    fprintf (To, ", harum-scarum man./*Temp1*/\n");
+    fprintf (To, ", harum-scarum person./*Temp1*/\n");
 
     PUSH_CHARACTER(T2);
-    fprintf (To, ", friend of harum-scarum man./*Temp2*/\n");
+    fprintf (To, ", friend of harum-scarum person./*Temp2*/\n");
 
     PUSH_CHARACTER(IA);
-    fprintf (To, ", right-hand man./*strange instance assist*/\n");
+    fprintf (To, ", right-hand person./*strange instance assist*/\n");
 
     PUSH_CHARACTER(RE);
-    fprintf (To, ", devoted woman./*Variable for return value*/\n");
+    fprintf (To, ", devoted person./*Variable for return value*/\n");
 
-    PUSH_CHARACTER(AI);
-    fprintf (To, ", door keeper./*Arr i assist*/\n");
+    //PUSH_CHARACTER(AI);
+    //fprintf (To, ", door keeper./*Arr i assist*/\n");
 
     PUSH_CHARACTER(LA);
     fprintf (To, ", interesting person./*links assist*/\n");
@@ -381,12 +386,12 @@ void CreateScene (FILE* To, int A, int B, newTreeToShekspearData& ShData)
         fprintf (To, "[Exit ");
         if (ShData.OnScene.Data_ [0] == A || ShData.OnScene.Data_ [0] == B)
         {
-            AddListItem ("character", ShData.OnScene.Data_ [1], To, ShData.Way);
+            PUSH_CHARACTER (ShData.OnScene.Data_ [1]);
             ShData.OnScene.Rem (ShData.OnScene.Data_ [1]);
         }
         else
         {
-            AddListItem ("character", ShData.OnScene.Data_ [0], To, ShData.Way);
+            PUSH_CHARACTER (ShData.OnScene.Data_ [0]);
             ShData.OnScene.Rem (ShData.OnScene.Data_ [0]);
         }
         fprintf (To, "]\n");
@@ -403,14 +408,14 @@ void CreateScene (FILE* To, int A, int B, newTreeToShekspearData& ShData)
     fprintf (To, "[Enter ");
     if (!ShData.OnScene.Find (A))
     {
-        AddListItem ("character", A, To, ShData.Way);
+        PUSH_CHARACTER (A);
         ShData.OnScene.Add (A);
 
         if (!ShData.OnScene.Find (B)) fprintf (To, " and ");
     }
     if (!ShData.OnScene.Find (B))
     {
-        AddListItem ("character", B, To, ShData.Way);
+        PUSH_CHARACTER (B);
         ShData.OnScene.Add (B);
     }
     fprintf (To, "]\n");
@@ -420,7 +425,7 @@ void CreateSpeech (FILE* To, int A, newTreeToShekspearData& ShData)
     if (ShData.CurrentSpeaker == A) return;
 
     fprintf (To, "\n");
-    AddListItem ("character", A, To, ShData.Way);
+    PUSH_CHARACTER (A);
     fprintf (To, ":\n");
     ShData.CurrentSpeaker = A;
 }
@@ -513,52 +518,61 @@ void AddGotoScene (FILE* To, int A, newTreeToShekspearData& ShData)
 
 void PushNumber (FILE* To, double Num, newTreeToShekspearData& ShData)
 {
-    if (Num != (int)Num)
+    #define MAX_POW 5
+
+    #define DOUBLE_EQL(A, B) (fabs ((A) - (B)) <= DBL_EPSILON * fmax (fabs (A), fabs (B)))
+    #define IS_INT(A) (DOUBLE_EQL ((long long)(A), A))
+
+    if (!IS_INT (Num))
     {
-        if ((int)Num != 0)
+        if ((long long)Num != 0)
         {
             fprintf (To, "the sum of ");
-            PushNumber (To, (int)Num, ShData);
+            PushNumber (To, floor (Num), ShData);
             fprintf (To, " and ");
-            Num -= (int)Num;
+            Num -= floor (Num);
         }
 
-        int TenPow = 0;
-        while (Num != (int)Num)
+        int powBase = 10;
+
+        int pow = 0;
+        while (!IS_INT (Num) && pow < MAX_POW)
         {
-            TenPow ++;
-            Num *= 10;
+            pow ++;
+            Num *= powBase;
         }
 
         fprintf (To, "the quotient between ");
-        PushNumber (To, Num, ShData);
+        PushNumber (To, (long long)Num, ShData);
         fprintf (To, " and ");
 
-        while (TenPow > 1)
+        while (pow > 1)
         {
-            if (TenPow % 3 == 0)
+            if (pow % 3 == 0)
             {
                 fprintf (To, "the cube of ");
 
-                TenPow /= 3;
+                pow /= 3;
 
                 continue;
             }
-            if (TenPow % 2 == 0)
+            if (pow % 2 == 0)
             {
                 fprintf (To, "the square of ");
 
-                TenPow /= 2;
+                pow /= 2;
 
                 continue;
             }
 
             fprintf (To, "the product of ");
-            PushNumber (To, 10, ShData);
+            PushNumber (To, powBase, ShData);
             fprintf (To, " and ");
+
+            pow --;
         }
 
-        PushNumber (To, 10, ShData);
+        PushNumber (To, powBase, ShData);
     }
     else
     {
@@ -1236,7 +1250,8 @@ void SetVar (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>
 }
 
 void PushArrIFunc (FILE* To, newTreeInfo& Info, newVector <newNodeInfo>& NodeInfo, newTreeToShekspearData& ShData, int A)
-{
+;
+/*{
     int ArrID = (A - MEMORY_OFFSET_ - Info.VarMemory) / 3;
     if (ShData.ArrFuncComplete [ArrID])
     {
@@ -1493,7 +1508,7 @@ void PushArrIFunc (FILE* To, newTreeInfo& Info, newVector <newNodeInfo>& NodeInf
     if (Ver (50)) fprintf (To, "    Let us ");
     else             fprintf (To, "    We shall ");
     fprintf (To, "back.\n");
-}
+}*/
 
 void New (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& NodeInfo, newTreeToShekspearData& ShData)
 {

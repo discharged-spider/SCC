@@ -5,7 +5,9 @@
 #include "stdlib.h"
 #include "strings.h"
 
-int  ListSize (const char ListName [], string Way);
+#include "map"
+
+int ListSize (const char ListName [], string Way);
 void AddListItem (const char ListName [], int i, FILE* To, string Way);
 void AddRandListItem (const char ListName [], FILE* To, string Way);
 
@@ -17,9 +19,48 @@ T Mod (T a)
     return (a > 0)? a : -a;
 }
 
+struct Shuffler
+{
+    int max;
+
+    std::map <int, int> new_i;
+
+    Shuffler ()
+    {
+        max = -1;
+    }
+
+    int shuffle (int i)
+    {
+        assert (max != -1);
+
+        if (new_i.count (i) == 0)
+        {
+            while (true)
+            {
+                new_i [i] = rand () % max;
+
+                bool ok = true;
+                for (std::map<int, int>::iterator it = new_i.begin(); it != new_i.end(); ++it)
+                {
+                    if (i != (*it).first && new_i [i] == (*it).second)
+                    {
+                        ok = false;
+                        break;
+                    }
+                }
+
+                if (ok) break;
+            }
+        }
+
+        return new_i [i];
+    }
+};
+
 //------------------------------------------------------------------------------
 
-int  ListSize (const char ListName [], string Way)
+int ListSize (const char ListName [], string Way)
 {
     Way += "..\\Lists\\";
     Way += ListName;
