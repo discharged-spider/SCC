@@ -21,6 +21,8 @@ struct newTreeToMyAsmData
     int ArrsToDelete;
 
     newAsmMemoryCounter MC;
+
+    bool UseInspector;
 };
 
 void CreateAsm    (FILE* To, newTree& Tree, newTreeInfo Info, newVector <newNodeInfo> NodeInfo);
@@ -31,9 +33,10 @@ void CreateAsmRec (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNod
 void PushInstance (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& NodeInfo, newTreeToMyAsmData& AsmData);
 
 void New (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& NodeInfo, newTreeToMyAsmData& AsmData);
-void PushArr (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& NodeInfo, newTreeToMyAsmData& AsmData, int ArrAddr, int i = 0);
+void PushArr (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& NodeInfo, newTreeToMyAsmData& AsmData, newNodeInfo& ArrInfo, int i = 0);
 
 void Equal (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& NodeInfo, newTreeToMyAsmData& AsmData);
+void SelfEqual (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& NodeInfo, newTreeToMyAsmData& AsmData);
 
 void Echo (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& NodeInfo, newTreeToMyAsmData& AsmData);
 void Get (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& NodeInfo, newTreeToMyAsmData& AsmData);
@@ -53,7 +56,7 @@ void PushParamArr (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNod
 
 //------------------------------------------------------------------------------
 
-void CreateAsm (FILE* To, newTree& Tree, newTreeInfo Info, newVector <newNodeInfo> NodeInfo)
+void CreateAsm (FILE* To, newTree& Tree, newTreeInfo Info, newVector <newNodeInfo> NodeInfo, bool UseInspector)
 {
     newTreeToMyAsmData AsmData;
 
@@ -64,6 +67,8 @@ void CreateAsm (FILE* To, newTree& Tree, newTreeInfo Info, newVector <newNodeInf
     AsmData.InFunction = -1;
 
     AsmData.ArrsToDelete = 0;
+
+    AsmData.UseInspector = UseInspector;
 
     fprintf (To, "push %d //Size\n", MEMORY_OFFSET_ + Info.VarMemory + 2 * Info.ArrMemory);
     fprintf (To, "add //Reserve memory for addreses\n");
@@ -117,6 +122,21 @@ void CreateAsmRec (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNod
     if (Data.Descriptor == N_EQ)
     {
         Equal (To, Tree, Info, NodeInfo, AsmData);
+
+        return ;
+    }
+
+    if (
+       Data.Descriptor == N_INCR   ||
+       Data.Descriptor == N_DECR   ||
+       Data.Descriptor == N_SUM_EQ ||
+       Data.Descriptor == N_SUB_EQ ||
+       Data.Descriptor == N_MUL_EQ ||
+       Data.Descriptor == N_DIV_EQ ||
+       Data.Descriptor == N_MOD_EQ
+       )
+    {
+        SelfEqual (To, Tree, Info, NodeInfo, AsmData);
 
         return ;
     }
@@ -201,13 +221,13 @@ void CreateAsmRec (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNod
 
     if (Data.Descriptor == N_GOTO)
     {
-        fprintf (To, "goto %d //%s\n", Info.FuncNumber * 2 + NodeInfo[Tree.CurrentNode ()].ID, Data.Name);
+        fprintf (To, "goto %d //%s\n", Info.FuncNumber * 2 + NodeInfo[Tree.CurrentNode ()].ID, Data.GetName ());
 
         return ;
     }
     if (Data.Descriptor == N_MARK)
     {
-        fprintf (To, ": %d //%s\n", Info.FuncNumber * 2 + NodeInfo[Tree.CurrentNode ()].ID, Data.Name);
+        fprintf (To, ": %d //%s\n", Info.FuncNumber * 2 + NodeInfo[Tree.CurrentNode ()].ID, Data.GetName ());
 
         return ;
     }
@@ -248,16 +268,18 @@ void PushInstance (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNod
 
     if (Data.Descriptor == N_NUM)
     {
-        fprintf (To, "push %lg\n", Data.Data);
+        fprintf (To, "push %g\n", Data.Data);
 
         return;
     }
 
     if (Data.Descriptor == N_VAR)
     {
-        fprintf (To, "pushm %d //Address %s\n", MEMORY_OFFSET_ + NodeInfo[Tree.CurrentNode ()].Addr, Data.Name);
+        fprintf (To, "pushm %d //Address %s\n", MEMORY_OFFSET_ + NodeInfo[Tree.CurrentNode ()].Addr, Data.GetName ());
         fprintf (To, "pushms\n");
         fprintf (To, "\n");
+
+        if (AsmData.UseInspector) fprintf (To, "log_get_var %d //ID of %s\n", NodeInfo[Tree.CurrentNode ()].ID, Data.GetName ());
 
         return;
     }
@@ -266,17 +288,20 @@ void PushInstance (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNod
     {
         fprintf (To, "//Push arr cell\n");
         fprintf (To, "//{\n");
-        fprintf (To, "pushm %d //Adress %s\n", MEMORY_OFFSET_ + Info.VarMemory + 2 * NodeInfo[Tree.CurrentNode ()].Addr, Data.Name);
-        fprintf (To, "//%s index\n", Data.Name);
+        fprintf (To, "pushm %d //Adress %s\n", MEMORY_OFFSET_ + Info.VarMemory + 2 * NodeInfo[Tree.CurrentNode ()].Addr, Data.GetName ());
+        fprintf (To, "//%s index\n", Data.GetName ());
 
         Tree.DownL ();
         PushInstance (To, Tree, Info, NodeInfo, AsmData);
         Tree.Up  ();
 
         fprintf (To, "sum\n");
-        fprintf (To, "pushms //%s\n", Data.Name);
+        fprintf (To, "pushms //%s\n", Data.GetName ());
         fprintf (To, "//}\n");
         fprintf (To, "\n");
+
+        if (AsmData.UseInspector) fprintf (To, "log_get_arr %d //ID of %s\n", NodeInfo[Tree.CurrentNode ()].ID, Data.GetName ());
+
         return;
     }
 
@@ -411,54 +436,34 @@ void PushInstance (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNod
     }
     if (Data.Descriptor == N_MREQ)
     {
-        fprintf (To, "//More or equal\n");
-        fprintf (To, "//{\n");
-
         Tree.DownR ();
         PushInstance (To, Tree, Info, NodeInfo, AsmData);
         Tree.Up ();
-        fprintf (To, "dup\n");
-        fprintf (To, "\n");
+
         Tree.DownL ();
         PushInstance (To, Tree, Info, NodeInfo, AsmData);
         Tree.Up ();
-        fprintf (To, "dup\n");
-        fprintf (To, "down 2\n");
-        fprintf (To, "\n");
-        fprintf (To, "more\n");
-        fprintf (To, "down 2\n");
-        fprintf (To, "equal\n");
-        fprintf (To, "\n");
-        fprintf (To, "sum\n");
-        fprintf (To, "push 0\n");
+
         fprintf (To, "less\n");
-        fprintf (To, "//}\n");
+
+        fprintf (To, "not\n");
+
         return ;
     }
     if (Data.Descriptor == N_LSEQ)
     {
-        fprintf (To, "//Less or equal\n");
-        fprintf (To, "//{\n");
-
         Tree.DownR ();
         PushInstance (To, Tree, Info, NodeInfo, AsmData);
         Tree.Up ();
-        fprintf (To, "dup\n");
-        fprintf (To, "\n");
+
         Tree.DownL ();
         PushInstance (To, Tree, Info, NodeInfo, AsmData);
         Tree.Up ();
-        fprintf (To, "dup\n");
-        fprintf (To, "down 2\n");
-        fprintf (To, "\n");
-        fprintf (To, "less\n");
-        fprintf (To, "down 2\n");
-        fprintf (To, "equal\n");
-        fprintf (To, "\n");
-        fprintf (To, "sum\n");
-        fprintf (To, "push 0\n");
-        fprintf (To, "less\n");
-        fprintf (To, "//}\n");
+
+        fprintf (To, "more\n");
+
+        fprintf (To, "not\n");
+
         return ;
     }
 
@@ -517,12 +522,12 @@ void New (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& N
 
     if (Data.Descriptor == N_VAR)
     {
-        fprintf (To, "//New variable %s\n", Data.Name);
+        fprintf (To, "//New variable %s\n", Data.GetName ());
         fprintf (To, "//{\n");
 
-        fprintf (To, "push 1 //Size of %s\n", Data.Name);
+        fprintf (To, "push 1 //Size of %s\n", Data.GetName ());
         fprintf (To, "add //Reserve memory\n");
-        fprintf (To, "popm %d //Push Addr to %s's cell\n", MEMORY_OFFSET_ + NodeInfo[Tree.CurrentNode ()].Addr, Data.Name);
+        fprintf (To, "popm %d //Push Addr to %s's cell\n", MEMORY_OFFSET_ + NodeInfo[Tree.CurrentNode ()].Addr, Data.GetName ());
 
         AsmData.MC.Add (MEMORY_OFFSET_ + NodeInfo[Tree.CurrentNode ()].Addr);
 
@@ -536,8 +541,11 @@ void New (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& N
             Tree.Up ();
 
             fprintf (To, "\n");
-            fprintf (To, "pushm %d //Address of %s\n", MEMORY_OFFSET_ + NodeInfo [Tree.CurrentNode ()].Addr, Data.Name);
+            fprintf (To, "pushm %d //Address of %s\n", MEMORY_OFFSET_ + NodeInfo [Tree.CurrentNode ()].Addr, Data.GetName ());
             fprintf (To, "popms\n");
+
+            //if (AsmData.UseInspector) fprintf (To, "log_set_var %d //ID of %s\n", NodeInfo[Tree.CurrentNode ()].ID, Tree.Get ().GetName ());
+
             fprintf (To, "//}\n");
         }
 
@@ -548,7 +556,7 @@ void New (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& N
     }
     if (Data.Descriptor == N_ARR)
     {
-        fprintf (To, "//New arr %s\n", Data.Name);
+        fprintf (To, "//New arr %s\n", Data.GetName ());
         fprintf (To, "//{\n");
 
         int Size = 0;
@@ -579,17 +587,17 @@ void New (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& N
         fprintf (To, "\n");
 
         fprintf (To, "add //Reserve memory\n");
-        fprintf (To, "popm %d //Push Addr to %s's cell\n", MEMORY_OFFSET_ + Info.VarMemory + 2 * NodeInfo[Tree.CurrentNode ()].Addr, Data.Name);
+        fprintf (To, "popm %d //Push Addr to %s's cell\n", MEMORY_OFFSET_ + Info.VarMemory + 2 * NodeInfo[Tree.CurrentNode ()].Addr, Data.GetName ());
 
         AsmData.MC.Add (MEMORY_OFFSET_ + Info.VarMemory + 2 * NodeInfo[Tree.CurrentNode ()].Addr);
 
-        int Addr = NodeInfo [Tree.CurrentNode ()].Addr;
+        newNodeInfo& ArrInfo = NodeInfo [Tree.CurrentNode ()];
 
         if (Tree.CanDownR ())
         {
             Tree.DownR ();
             Tree.DownR ();
-            PushArr (To, Tree, Info, NodeInfo, AsmData, Addr);
+            PushArr (To, Tree, Info, NodeInfo, AsmData, ArrInfo);
             Tree.Up ();
             Tree.Up ();
         }
@@ -621,7 +629,7 @@ void New (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& N
     }
 }
 
-void PushArr (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& NodeInfo, newTreeToMyAsmData& AsmData, int ArrAddr, int i)
+void PushArr (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& NodeInfo, newTreeToMyAsmData& AsmData, newNodeInfo& ArrInfo, int i)
 {
     //printf ("PushArr\n");
     if (Tree.Get ().Descriptor != N_NODE)
@@ -633,10 +641,12 @@ void PushArr (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo
 
         fprintf (To, "\n");
 
-        fprintf (To, "pushm %d\n", MEMORY_OFFSET_ + Info.VarMemory + 2 * ArrAddr);
+        fprintf (To, "pushm %d\n", MEMORY_OFFSET_ + Info.VarMemory + 2 * ArrInfo.Addr);
         fprintf (To, "push  %d //i\n", i);
         fprintf (To, "sum\n");
         fprintf (To, "popms\n");
+
+        if (AsmData.UseInspector) fprintf (To, "log_set_arr %d //ID of arr\n", ArrInfo.ID);
 
         fprintf (To, "//}\n");
         fprintf (To, "\n");
@@ -647,13 +657,13 @@ void PushArr (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo
     if (Tree.CanDownL ())
     {
         Tree.DownL ();
-        PushArr (To, Tree, Info, NodeInfo, AsmData, ArrAddr, i);
+        PushArr (To, Tree, Info, NodeInfo, AsmData, ArrInfo, i);
         Tree.Up ();
     }
     if (Tree.CanDownR ())
     {
         Tree.DownR ();
-        PushArr (To, Tree, Info, NodeInfo, AsmData, ArrAddr, i + 1);
+        PushArr (To, Tree, Info, NodeInfo, AsmData, ArrInfo, i + 1);
         Tree.Up ();
     }
 }
@@ -675,8 +685,10 @@ void Equal (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>&
 
     if (Tree.Get ().Descriptor == N_VAR)
     {
-        fprintf (To, "pushm %d //Adress of %s\n", MEMORY_OFFSET_ + NodeInfo [Tree.CurrentNode ()].Addr, Tree.Get ().Name);
+        fprintf (To, "pushm %d //Adress of %s\n", MEMORY_OFFSET_ + NodeInfo [Tree.CurrentNode ()].Addr, Tree.Get ().GetName ());
         fprintf (To, "popms\n");
+
+        if (AsmData.UseInspector) fprintf (To, "log_set_var %d //ID of %s\n", NodeInfo[Tree.CurrentNode ()].ID, Tree.Get ().GetName ());
     }
     if (Tree.Get ().Descriptor == N_ARR)
     {
@@ -685,13 +697,77 @@ void Equal (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>&
         PushInstance (To, Tree, Info, NodeInfo, AsmData);
         Tree.Up ();
 
-        fprintf (To, "pushm %d //Adress of %s\n", MEMORY_OFFSET_ + Info.VarMemory + 2 * NodeInfo[Tree.CurrentNode ()].Addr, Tree.Get ().Name);
+        fprintf (To, "pushm %d //Adress of %s\n", MEMORY_OFFSET_ + Info.VarMemory + 2 * NodeInfo[Tree.CurrentNode ()].Addr, Tree.Get ().GetName ());
         fprintf (To, "sum\n");
 
         fprintf (To, "popms\n");
+
+        if (AsmData.UseInspector) fprintf (To, "log_set_arr %d //ID of %s\n", NodeInfo[Tree.CurrentNode ()].ID, Tree.Get ().GetName ());
     }
 
     Tree.Up ();
+
+    fprintf (To, "//}\n");
+}
+
+void SelfEqual (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& NodeInfo, newTreeToMyAsmData& AsmData)
+{
+    //printf ("Equal\n");
+    fprintf (To, "//SelfEqual\n");
+    fprintf (To, "//{\n");
+
+    fprintf (To, "//Who\n");
+
+    Tree.DownL ();
+
+    if (Tree.Get ().Descriptor == N_VAR)
+    {
+        fprintf (To, "pushm %d //Adress of %s\n", MEMORY_OFFSET_ + NodeInfo [Tree.CurrentNode ()].Addr, Tree.Get ().GetName ());
+
+        if (AsmData.UseInspector) fprintf (To, "log_set_var %d //ID of %s (it will be set later)\n", NodeInfo[Tree.CurrentNode ()].ID, Tree.Get ().GetName ());
+    }
+    if (Tree.Get ().Descriptor == N_ARR)
+    {
+        fprintf (To, "//[]\n");
+        Tree.DownL ();
+        PushInstance (To, Tree, Info, NodeInfo, AsmData);
+        Tree.Up ();
+
+        fprintf (To, "pushm %d //Adress of %s\n", MEMORY_OFFSET_ + Info.VarMemory + 2 * NodeInfo[Tree.CurrentNode ()].Addr, Tree.Get ().GetName ());
+        fprintf (To, "sum\n");
+
+        if (AsmData.UseInspector) fprintf (To, "log_set_arr %d //ID of %s (it will be set later)\n", NodeInfo[Tree.CurrentNode ()].ID, Tree.Get ().GetName ());
+    }
+
+    Tree.Up ();
+
+    fprintf (To, "dup\n");
+    fprintf (To, "pushms //To make something with who\n");
+
+    fprintf (To, "//What\n");
+    if (Tree.Get ().Descriptor != N_INCR && Tree.Get ().Descriptor != N_DECR)
+    {
+        Tree.DownR ();
+        PushInstance (To, Tree, Info, NodeInfo, AsmData);
+        Tree.Up ();
+    }
+    else
+    {
+        fprintf (To, "push 1 //To increase/decrease by 1\n");
+    }
+
+    fprintf (To, "swap\n");
+
+    if (Tree.Get ().Descriptor == N_INCR)   fprintf (To, "sum //Special ingredient\n");
+    if (Tree.Get ().Descriptor == N_DECR)   fprintf (To, "sub //Special ingredient\n");
+    if (Tree.Get ().Descriptor == N_SUM_EQ) fprintf (To, "sum //Special ingredient\n");
+    if (Tree.Get ().Descriptor == N_SUB_EQ) fprintf (To, "sub //Special ingredient\n");
+    if (Tree.Get ().Descriptor == N_MUL_EQ) fprintf (To, "mul //Special ingredient\n");
+    if (Tree.Get ().Descriptor == N_DIV_EQ) fprintf (To, "div //Special ingredient\n");
+    if (Tree.Get ().Descriptor == N_MOD_EQ) fprintf (To, "mod //Special ingredient\n");
+
+    fprintf (To, "swap\n");
+    fprintf (To, "popms //Done\n");
 
     fprintf (To, "//}\n");
 }
@@ -726,8 +802,10 @@ void Get (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& N
 
     if (Tree.Get ().Descriptor == N_VAR)
     {
-        fprintf (To, "pushm %d //Adress of %s\n", MEMORY_OFFSET_ + NodeInfo [Tree.CurrentNode ()].Addr, Tree.Get ().Name);
+        fprintf (To, "pushm %d //Adress of %s\n", MEMORY_OFFSET_ + NodeInfo [Tree.CurrentNode ()].Addr, Tree.Get ().GetName ());
         fprintf (To, "popms\n");
+
+        if (AsmData.UseInspector) fprintf (To, "log_set_var %d //ID of %s\n", NodeInfo[Tree.CurrentNode ()].ID, Tree.Get ().GetName ());
     }
     if (Tree.Get ().Descriptor == N_ARR)
     {
@@ -736,10 +814,12 @@ void Get (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& N
         PushInstance (To, Tree, Info, NodeInfo, AsmData);
         Tree.Up ();
 
-        fprintf (To, "pushm %d //Adress of %s\n", MEMORY_OFFSET_ + Info.VarMemory + 2 * NodeInfo[Tree.CurrentNode ()].Addr, Tree.Get ().Name);
+        fprintf (To, "pushm %d //Adress of %s\n", MEMORY_OFFSET_ + Info.VarMemory + 2 * NodeInfo[Tree.CurrentNode ()].Addr, Tree.Get ().GetName ());
         fprintf (To, "sum\n");
 
         fprintf (To, "popms\n");
+
+        if (AsmData.UseInspector) fprintf (To, "log_set_arr %d //ID of %s\n", NodeInfo[Tree.CurrentNode ()].ID, Tree.Get ().GetName ());
     }
 
     Tree.Up ();
@@ -907,7 +987,7 @@ void NewFunc (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo
     newNodeData Data = Tree.Get ();
     int CN = Tree.CurrentNode();
 
-    fprintf (To, "//New func %s\n", Data.Name);
+    fprintf (To, "//New func %s\n", Data.GetName ());
     fprintf (To, "//{\n");
 
     fprintf (To, "goto %d //End\n", NodeInfo[CN].ID * 2 + 1);
@@ -947,7 +1027,7 @@ void NewFunc (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo
 
     fprintf (To, "end\n");
     fprintf (To, ": %d //End\n", NodeInfo[CN].ID * 2 + 1);
-    if (strcmp (Data.Name, "main") == 0)
+    if (strcmp (Data.GetName (), "main") == 0)
     {
         fprintf (To, "//Main special\n");
         fprintf (To, "//{\n");
@@ -966,10 +1046,10 @@ void CallFunc (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInf
     //printf ("CallFunc\n");
     newNodeData Data = Tree.Get ();
 
-    fprintf (To, "//Call function %s\n", Data.Name);
+    fprintf (To, "//Call function %s\n", Data.GetName ());
     fprintf (To, "//{\n");
 
-    printf ("Name = %s\n", Data.Name);
+    printf ("GetName () = %s\n", Data.GetName ());
 
     AsmData.MC.PrintfPush (To, NodeInfo[Tree.CurrentNode()].ID);
 
@@ -989,7 +1069,7 @@ void CallFunc (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInf
         Tree.Up ();
     }
 
-    if (NodeInfo[Tree.CurrentNode()].Addr == -2) fprintf (To, "//NATIVE CALL! Will cause error, if function not exist\n");
+    if (NodeInfo[Tree.CurrentNode()].Addr == -2) fprintf (To, "//NATIVE CALL! Will cause error, if function not exist. Function GetName (): \"%s\".\n", Tree.Get ().GetName ());
     fprintf (To, "call %d\n", NodeInfo[Tree.CurrentNode()].ID * 2);
 
     if (AsmData.ArrsToDelete > 0)
@@ -1027,7 +1107,7 @@ void PushParams (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeI
 
     if (Data.Descriptor == N_ARR)
     {
-        fprintf (To, "pushm %d //Address of arr %s\n", MEMORY_OFFSET_ + Info.VarMemory + 2 * NodeInfo[Tree.CurrentNode ()].Addr, Data.Name);
+        fprintf (To, "pushm %d //Address of arr %s\n", MEMORY_OFFSET_ + Info.VarMemory + 2 * NodeInfo[Tree.CurrentNode ()].Addr, Data.GetName ());
 
         i ++;
 
@@ -1040,13 +1120,13 @@ void PushParams (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeI
 
         if (Tree.Get ().Descriptor == N_VAR)
         {
-            fprintf (To, "pushm %d //Address of link(var) %s\n", MEMORY_OFFSET_ + NodeInfo[Tree.CurrentNode ()].Addr, Data.Name);
+            fprintf (To, "pushm %d //Address of link(var) %s\n", MEMORY_OFFSET_ + NodeInfo[Tree.CurrentNode ()].Addr, Data.GetName ());
         }
         else
         {
             fprintf (To, "//Push arr link\n");
             fprintf (To, "//{\n");
-            fprintf (To, "pushm %d //Address of link(arr) %s\n", MEMORY_OFFSET_ + Info.VarMemory + 2 * NodeInfo[Tree.CurrentNode ()].Addr, Data.Name);
+            fprintf (To, "pushm %d //Address of link(arr) %s\n", MEMORY_OFFSET_ + Info.VarMemory + 2 * NodeInfo[Tree.CurrentNode ()].Addr, Data.GetName ());
             Tree.DownL ();
             fprintf (To, "//Push instace\n");
             fprintf (To, "//{\n");
@@ -1116,24 +1196,24 @@ void PopParams (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeIn
 
     if (Data.Descriptor == N_VAR)
     {
-        fprintf (To, "push 1 //Size of %s\n", Data.Name);
+        fprintf (To, "push 1 //Size of %s\n", Data.GetName ());
         fprintf (To, "add //Reserve memory\n");
 
-        fprintf (To, "popm %d //Push Addr to %s's cell\n", MEMORY_OFFSET_ + NodeInfo[Tree.CurrentNode ()].Addr, Data.Name);
+        fprintf (To, "popm %d //Push Addr to %s's cell\n", MEMORY_OFFSET_ + NodeInfo[Tree.CurrentNode ()].Addr, Data.GetName ());
 
         AsmData.MC.Add (MEMORY_OFFSET_ + NodeInfo[Tree.CurrentNode ()].Addr);
 
-        fprintf (To, "pushm %d //Push Addr to %s's cell\n", MEMORY_OFFSET_ + NodeInfo[Tree.CurrentNode ()].Addr, Data.Name);
+        fprintf (To, "pushm %d //Push Addr to %s's cell\n", MEMORY_OFFSET_ + NodeInfo[Tree.CurrentNode ()].Addr, Data.GetName ());
 
         fprintf (To, "popms\n");
     }
     if (Data.Descriptor == N_LNK)
     {
-        fprintf (To, "popm %d //Set adress of link %s\n", MEMORY_OFFSET_ + NodeInfo [Tree.CurrentNode ()].Addr, Tree.Get ().Name);
+        fprintf (To, "popm %d //Set adress of link %s\n", MEMORY_OFFSET_ + NodeInfo [Tree.CurrentNode ()].Addr, Tree.Get ().GetName ());
     }
     if (Data.Descriptor == N_ARR)
     {
-        fprintf (To, "popm %d //Set adress of arr %s\n", MEMORY_OFFSET_ + Info.VarMemory + 2 * NodeInfo [Tree.CurrentNode ()].Addr, Tree.Get ().Name);
+        fprintf (To, "popm %d //Set adress of arr %s\n", MEMORY_OFFSET_ + Info.VarMemory + 2 * NodeInfo [Tree.CurrentNode ()].Addr, Tree.Get ().GetName ());
     }
 
     if (Tree.CanDownR ())

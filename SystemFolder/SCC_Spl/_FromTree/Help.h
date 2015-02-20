@@ -1,17 +1,28 @@
 #ifndef HELP_H__
 #define HELP_H__
 
+#include "iostream"
+
 #include "stdio.h"
 #include "stdlib.h"
 #include "strings.h"
 
 #include "map"
 
+//------------------------------------------------------------------------------
+
 int ListSize (const char ListName [], string Way);
 void AddListItem (const char ListName [], int i, FILE* To, string Way);
 void AddRandListItem (const char ListName [], FILE* To, string Way);
 
-bool Ver (int percens);
+int randint (int min, int max);
+
+//will generate random number from 1 to states_num, and will return it for next (states_num - 1) executions
+int rand_state (int states_num);
+
+bool coin_toss ();
+
+//------------------------------------------------------------------------------
 
 template <typename T>
 T Mod (T a)
@@ -38,7 +49,7 @@ struct Shuffler
         {
             while (true)
             {
-                new_i [i] = rand () % max;
+                new_i [i] = randint (0, max - 1);
 
                 bool ok = true;
                 for (std::map<int, int>::iterator it = new_i.begin(); it != new_i.end(); ++it)
@@ -118,12 +129,41 @@ void AddListItem (const char ListName [], int i, FILE* To, string Way)
 
 void AddRandListItem (const char ListName [], FILE* To, string Way)
 {
-    AddListItem (ListName, rand () % ListSize (ListName, Way), To, Way);
+    #ifndef DEBUG
+
+    AddListItem (ListName, randint (0, ListSize (ListName, Way) - 1), To, Way);
+
+    #else
+
+    fprintf (To, "%s", ListName);
+
+    #endif
 }
 
-bool Ver (int percens)
+int randint (int min, int max)
 {
-    return (rand () % 100) < percens;
+    return min + rand () % (max - min + 1);
+}
+
+int rand_state (int states_num)
+{
+    static int last_num   = 0;
+    static int calls_num  = 0;
+
+    if (calls_num == 0)
+    {
+        last_num = randint (1, states_num);
+        calls_num = states_num;
+    }
+
+    calls_num --;
+
+    return last_num;
+}
+
+bool coin_toss ()
+{
+    return randint (0, 1) == 0;
 }
 
 #endif

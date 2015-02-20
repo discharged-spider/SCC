@@ -4,78 +4,102 @@
 #include "Processor.h"
 #include <time.h>
 
+#include "..\\..\\SystemFolder\\_SystemLibs\\ConsoleApp\\ConsoleApp.h"
+
 #define GetPTinMS ((double)clock() * (double)1000 / (double)CLOCKS_PER_SEC)
 
-void PrintfHelp ();
-void SetConfig (FILE* Config, newProcessor& Processor);
 void Dump (newProcessor& Processor, double Time);
 
-int main (int argc, char** argv)
+int main (int ArgN, char** ARG)
 {
+if (ArgN == 1)
+    {
+        printf ("%s help.\n", PROGRAM_NAME);
+        printf ("Arguments:\n");
+        printf ("-i input_file_name (default = \"Program.scc_exe\")\n");
+        printf ("-e error_output_file_name (default = \"Error.txt\")\n");
+        printf ("-fi file_input_name - to get input by file\n");
+        printf ("-fo file_output_name - to get input by file\n");
+        printf ("-insp log_file_name - to enable vars and arrs get/set logging\n");
+        exit (0);
+    }
+
+    #define ADDR ARG [0]
+    string Way = GetMyWay (ADDR);
+    string Temp = Way;
+
+    char InputName [] = "Program.scc_exe";
+    FILE* Input = NULL;
+    FILE* ErrorOutput = NULL;
+    FILE* VarsArrsLog = NULL;
+
+    FILE* FInput = NULL;
+    FILE* FOutput = NULL;
+
     try
     {
-        const int MCS = 30;
-
-        if (argc == 1 || argc > 3)
+        for (int i = 1; i < ArgN; i ++)
         {
-            PrintfHelp ();
-
-            return 0;
-        }
-
-        char ProgramName [MCS] = "";
-        char ConfigName  [MCS] = "";
-
-        if (argc == 2)
-        {
-            if (strlen (argv [1]) + 1 > (int)MCS) throw TH_ERROR "File name too big");
-            else                            sprintf (ProgramName, "%s", argv [1]);
-
-            sprintf (ConfigName, "Config.dat");
-
-            FILE* ConfigFile = fopen (ConfigName, "r");
-            if (!ConfigFile)
+            if (strcmp (ARG[i], "-i") == 0)
             {
-                ConfigFile = fopen (ConfigName, "w");
+                i ++;
+                if (i >= ArgN) throw TH_ERROR "Sudden end after argument.");
 
-                fprintf (ConfigFile, "0");
+                PARAMS_FILE_OPEN (Input, ARG[i], "rb")
             }
+            if (strcmp (ARG[i], "-e") == 0)
+            {
+                i ++;
+                if (i >= ArgN) throw TH_ERROR "Sudden end after argument.");
 
-            fclose (ConfigFile);
+                PARAMS_FILE_OPEN (ErrorOutput, ARG[i], "ab")
+            }
+            if (strcmp (ARG[i], "-insp") == 0)
+            {
+                i ++;
+                if (i >= ArgN) throw TH_ERROR "Sudden end after argument.");
+
+                PARAMS_FILE_OPEN (VarsArrsLog, ARG[i], "wb")
+            }
+            if (strcmp (ARG[i], "-fi") == 0)
+            {
+                i ++;
+                if (i >= ArgN) throw TH_ERROR "Sudden end after argument.");
+
+                PARAMS_FILE_OPEN (FInput, ARG[i], "rb")
+            }
+            if (strcmp (ARG[i], "-fo") == 0)
+            {
+                i ++;
+                if (i >= ArgN) throw TH_ERROR "Sudden end after argument.");
+
+                PARAMS_FILE_OPEN (FOutput, ARG[i], "wb")
+            }
         }
-        else if (argc == 3)
-        {
-            if (strlen (argv [1]) + 1 > (int)MCS) throw TH_ERROR "File name too big");
-            else                            sprintf (ProgramName, "%s", argv [1]);
 
-            if (strlen (argv [2]) + 1 > (int)MCS) throw TH_ERROR "File name too big");
-            else                            sprintf (ConfigName, "%s", argv [2]);
-        }
-        else throw TH_ERROR "Invalid params");
+        if (!Input) Input = fopen (InputName, "rb");
+        if (!Input) throw TH_ERROR "No input file!");
 
-        FILE* ConfigFile  = fopen (ConfigName,  "r");
-        FILE* ProgramFile = fopen (ProgramName, "r");
+        if (!ErrorOutput) ErrorOutput = fopen ("Error.txt", "ab");
 
-        if (!ConfigFile)  throw TH_ERROR "Config file doesn't exist.");
-        if (!ProgramFile) throw TH_ERROR "Input file doesn't exist.");
+        int Mode = 0;
+        if (!fread (&Mode, sizeof (int), 1, Input)) throw TH_ERROR "Input is empty");
 
-        newProcessor Processor;
+        if (Mode != Syntax::PROC_MODE) throw TH_ERROR "I can run only scc_proc files (not scc_jit)");
 
         newVector <double> Program;
         int Size = 0;
 
-        SetConfig (ConfigFile, Processor);
+        CreateProcessorProgram (Input, Program, &Size);
 
-        int Mode = false;
-        if (!fread (&Mode, sizeof (int), 1, ProgramFile)) throw TH_ERROR "Input is empty");
+        fclose (Input);
 
-        if (Mode != 'P' + 'R' + 'O' + 'C') throw TH_ERROR "I can run only scc_proc files (not scc_jit)");
-
-        CreateProcessorProgram (ProgramFile, Program, &Size);
+        newProcessor Processor;
         Processor.SetProgram (&Program [0], Size);
 
-        fclose (ConfigFile);
-        fclose (ProgramFile);
+        if (VarsArrsLog) Processor.UseInspector_ = true;
+        Processor.input = FInput;
+        Processor.output = FOutput;
 
         printf ("__Processor__\n");
 
@@ -87,51 +111,29 @@ int main (int argc, char** argv)
         double TimeEnd = GetPTinMS;
 
         Dump (Processor, TimeEnd - TimeStart);
-    }
 
+        if (VarsArrsLog) Processor.Inspector_.save (VarsArrsLog);
+
+        fclose (ErrorOutput);
+    }
     catch (newThrowError& Error)
     {
-        printf ("__Processor__\n");
         printf ("%s", Error.ErrorText_);
+
+        if (!ErrorOutput) ErrorOutput = fopen ("Error.txt", "ab");
+        fprintf (ErrorOutput, "%s", Error.ErrorText_);
+        fclose (ErrorOutput);
     }
     catch (...)
     {
-        printf ("I don't know, what they said!");
-    }
-}
-
-void PrintfHelp ()
-{
-    printf ("___Help___\n");
-    printf ("Params: ConfigFileName ProgramFileName\n");
-    printf ("ProgramFileName  - Necessarily. Use assembler to compile.\n");
-    printf ("ConfigFileName - Optional. If not used config file name equals Config.dat. If not exist, will be created automaticaly. Contains params for memory (default = rand) and pushes for stack(comand = push), going after them.\n");
-
-    printf ("Comands:\n");
-    #define COMAND_DEF(NUM, NAME, DESCRIPTOR, PARAMS, CODE) printf ("%d need %d params after.\n", DESCRIPTOR, PARAMS);
-    #include "..\Syntax\ComandDef.h"
-    #undef COMAND_DEF
-}
-void SetConfig (FILE* Config, newProcessor& Processor)
-{
-    for (int i = 0; true; i ++)
-    {
-        if (fscanf (Config, "%lg", &Processor.Memory_[i]) == EOF) break;
+        printf ("Unknown error");
     }
 
-    char Word [35] = "";
-    while (true)
-    {
-        if (!ReadWord (Config, Word)) break;
-        if (strcmp (Word, "push") == 0)
-        {
-            double n = 0;
-            if (!fscanf (Config, "%lg", &n)) throw TH_ERROR "No number after push!");
+    //_fcloseall ();
 
-            Processor.Stack_.Push (n);
-        }
-    }
+    return 0;
 }
+
 void Dump (newProcessor& Processor, double Time)
 {
     printf ("__Info__\n");

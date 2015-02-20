@@ -7,6 +7,13 @@
 #include "cstring"
 #include "string"
 
+#include "..\Throw\Throw.h"
+
+#define PARAMS_FILE_OPEN(var, name, mode)\
+if (var) fclose (var);\
+var = fopen (name, mode);
+
+
 using namespace std;
 
 string GetMyWay (const char FirstArgument []);

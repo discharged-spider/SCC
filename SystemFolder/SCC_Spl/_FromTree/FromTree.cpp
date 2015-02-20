@@ -1,5 +1,7 @@
 #define PROGRAM_NAME "SCC_Tree_To_Shakespear"
-#define TREE_VERSION 9
+#define TREE_VERSION 10
+
+//#define DEBUG
 
 #include "..\\..\\_SystemLibs\\ConsoleApp\\ConsoleApp.h"
 
@@ -141,11 +143,12 @@ int main (int ArgN, char** ARG)
 
         if (!ErrorOutput) ErrorOutput = fopen ("Error.txt", "ab");
         fprintf (ErrorOutput, "%s", Error.ErrorText_);
+        fclose (ErrorOutput);
     }
     catch (...)
     {
         printf ("Unknown error");
     }
 
-    _fcloseall ();
+    //_fcloseall ();
 }

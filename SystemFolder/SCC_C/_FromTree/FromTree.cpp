@@ -1,5 +1,5 @@
 #define PROGRAM_NAME "SCC_Tree_To_C"
-#define TREE_VERSION 9
+#define TREE_VERSION 10
 
 #include "TreeToC.h"
 
@@ -78,11 +78,12 @@ int main (int ArgN, char** ARG)
 
         if (!ErrorOutput) ErrorOutput = fopen ("Error.txt", "ab");
         fprintf (ErrorOutput, "%s", Error.ErrorText_);
+        fclose (ErrorOutput);
     }
     catch (...)
     {
         printf ("I don't know, what they said!");
     }
 
-    _fcloseall ();
+    //_fcloseall ();
 }

@@ -1,1 +1,1 @@
-..\..\SCC\SCC.exe %1 -o Program.scc_asm
+..\..\SCC\SCC.exe %1 -o Program.scc_asm  -bp[ -insp ]

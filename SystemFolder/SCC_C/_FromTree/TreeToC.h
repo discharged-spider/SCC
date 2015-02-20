@@ -113,7 +113,28 @@ void CreateNode (newTree& Tree, FILE* To, int ind)
         return ;
     }
 
-    if (Data.Descriptor == N_EQ)
+    if (Data.Descriptor == N_INCR ||
+        Data.Descriptor == N_DECR)
+    {
+        PrintInd (To, ind);
+
+        Tree.DownL ();
+        CreateInstance (Tree, To);
+        Tree.Up ();
+        fprintf (To, " ");
+
+        if (Data.Descriptor == N_INCR) fprintf (To, "++");
+        if (Data.Descriptor == N_DECR) fprintf (To, "--");
+
+        fprintf (To, ";\n");
+    }
+
+    if (Data.Descriptor == N_EQ ||
+        Data.Descriptor == N_SUM_EQ ||
+        Data.Descriptor == N_SUB_EQ ||
+        Data.Descriptor == N_MUL_EQ ||
+        Data.Descriptor == N_DIV_EQ ||
+        Data.Descriptor == N_MOD_EQ)
     {
         PrintInd (To, ind);
 
@@ -121,7 +142,15 @@ void CreateNode (newTree& Tree, FILE* To, int ind)
         CreateInstance (Tree, To);
         Tree.Up ();
 
-        fprintf (To, " = ");
+        fprintf (To, " ");
+
+        if (Data.Descriptor == N_SUM_EQ) fprintf (To, "+");
+        if (Data.Descriptor == N_SUB_EQ) fprintf (To, "-");
+        if (Data.Descriptor == N_MUL_EQ) fprintf (To, "*");
+        if (Data.Descriptor == N_DIV_EQ) fprintf (To, "/");
+        if (Data.Descriptor == N_MOD_EQ) fprintf (To, "%%");
+
+        fprintf (To, "= ");
 
         Tree.DownR ();
         CreateInstance (Tree, To);
@@ -165,7 +194,7 @@ void CreateNode (newTree& Tree, FILE* To, int ind)
     {
         PrintInd (To, ind);
 
-        fprintf (To, ": %s;\n", Data.Name);
+        fprintf (To, ": %s;\n", Data.GetName ());
 
         return ;
     }
@@ -173,7 +202,7 @@ void CreateNode (newTree& Tree, FILE* To, int ind)
     {
         PrintInd (To, ind);
 
-        fprintf (To, "goto %s;\n", Data.Name);
+        fprintf (To, "goto %s;\n", Data.GetName ());
 
         return ;
     }
@@ -276,14 +305,14 @@ void CreateInstance (newTree& Tree, FILE* To)
     }
     if (Data.Descriptor == N_NUM)
     {
-        fprintf (To, "%lg", Data.Data);
+        fprintf (To, "%g", Data.Data);
 
         return;
     }
 
     if (Data.Descriptor == N_VAR)
     {
-        fprintf (To, "%s", Data.Name);
+        fprintf (To, "%s", Data.GetName ());
 
         return;
     }
@@ -296,7 +325,7 @@ void CreateInstance (newTree& Tree, FILE* To)
             CreateInstance (Tree, To);
             Tree.Up ();
         }
-        else fprintf (To, "&%s", Data.Name);
+        else fprintf (To, "&%s", Data.GetName ());
 
         return;
     }
@@ -308,7 +337,7 @@ void CreateInstance (newTree& Tree, FILE* To)
     }
     if (Data.Descriptor == N_ARR)
     {
-        fprintf (To, "%s [", Data.Name);
+        fprintf (To, "%s [", Data.GetName ());
 
         if (Tree.CanDownL ())
         {
@@ -607,7 +636,7 @@ void For (newTree& Tree, FILE* To, int ind)
 
 bool NewFunc (newTree& Tree, FILE* To, int ind)
 {
-    fprintf (To, "%s (", Tree.Get ().Name);
+    fprintf (To, "%s (", Tree.Get ().GetName ());
     if (Tree.CanDownL ())
     {
         Tree.DownL ();
@@ -666,7 +695,7 @@ void CreateNewParams (newTree& Tree, FILE* To, bool First)
 
 void CallFunc (newTree& Tree, FILE* To)
 {
-    fprintf (To, "%s (", Tree.Get ().Name);
+    fprintf (To, "%s (", Tree.Get ().GetName ());
     if (Tree.CanDownL ())
     {
         Tree.DownL ();

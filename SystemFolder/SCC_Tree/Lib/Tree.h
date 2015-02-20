@@ -3,12 +3,16 @@
 
 #include "cstdio"
 #include "cmath"
+#include "string"
+#include "memory"
 #include "..\..\_SystemLibs\Stack\Stack.h"
 #include "..\..\_SystemLibs\Throw\Throw.h"
 
 #ifndef TREE_VERSION
 #error No tree version defined!
 #endif
+
+using std::string;
 
 //==============================================================================
 
@@ -25,36 +29,54 @@ struct newNodeData
     int Descriptor;
 
     double Data;
-    char   Name [30];
+    char Name [30];
 
     newNodeData ();
     newNodeData (int NDescriptor);
     newNodeData (int NDescriptor, double NData);
+
+    void         SetName (const char NName []);
+    const char* GetName ();
 };
 
 newNodeData::newNodeData () :
     Descriptor (N_NODE),
-    Data       (-1)
-{
-    strcpy (Name, "");
-}
+    Data       (-1),
+    Name       ()
+{}
 newNodeData::newNodeData (int NDescriptor) :
     Descriptor (NDescriptor),
-    Data       (0)
-{
-    strcpy (Name, "");
-}
+    Data       (0),
+    Name       ()
+{}
 newNodeData::newNodeData (int NDescriptor, double NData) :
     Descriptor (NDescriptor),
-    Data       (NData)
+    Data       (NData),
+    Name       ()
+{}
+
+void newNodeData::SetName (const char NName [])
 {
-    strcpy (Name, "");
+    strcpy (Name, NName);
 }
+
+const char* newNodeData::GetName ()
+{
+    return Name;
+}
+
+//==============================================================================
+
+void DumpOut (newNodeData* Node);
+
+void CopyObj (newNodeData*  To, newNodeData*  From, int Size);
+
+//==============================================================================
 
 //Dump function for vector optimization
 void DumpOut (newNodeData* Node)
 {
-    printf ("Descriptor = %d, Data = %lg, Name = %s", (*Node).Descriptor, (*Node).Data, (*Node).Name);
+    printf ("Descriptor = %d, Data = %g, Name = %s", (*Node).Descriptor, (*Node).Data, (*Node).GetName ());
 }
 
 //Copy function for fast vector update
@@ -86,8 +108,18 @@ newNode::newNode () :
     Left   (-1),
     Right  (-1),
 
-    Level (0)
+    Level (0),
+
+    Data ()
 {}
+
+//------------------------------------------------------------------------------
+
+bool WriteNodeToFile (FILE* File, newNode& Node);
+bool ReadNodeFromFile (FILE* File, newNode& Node);
+void DumpOut (newNode* Node);
+
+void CopyObj (newNode*  To, newNode*  From, int Size);
 
 //------------------------------------------------------------------------------
 
@@ -136,6 +168,7 @@ class newTree
     newStack <int> PosSave_;
 
     newTree ();
+    ~newTree ();
 
     bool OK ();
     void Dump (const char* Title = NULL);
@@ -170,9 +203,9 @@ class newTree
     void Delete (bool AllUnderTree = false);
 
     //Get current node data
-    newNodeData Get ();
+    newNodeData& Get ();
     //Get current node data
-    void        Set (newNodeData NodeData);
+    void         Set (newNodeData NodeData);
 
     //Shows, if this tree empty
     bool Empty ();
@@ -195,13 +228,20 @@ class newTree
 //------------------------------------------------------------------------------
 
 newTree::newTree () :
+    Data_ (),
+
     Size_ (1),
-    CurrentNode_ (0)
+    CurrentNode_ (0),
+
+    PosSave_ ()
 {
     Data_ [0].Level = 0;
 
     assert (OK ());
 }
+
+newTree::~newTree ()
+{}
 
 //------------------------------------------------------------------------------
 
@@ -482,7 +522,7 @@ void newTree::Delete (bool AllUnderTree)
 
 //------------------------------------------------------------------------------
 
-newNodeData newTree::Get ()
+newNodeData& newTree::Get ()
 {
     assert (OK ());
 

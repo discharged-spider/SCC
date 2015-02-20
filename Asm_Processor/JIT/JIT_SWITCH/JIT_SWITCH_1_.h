@@ -1,4 +1,4 @@
-case (10/*sum*/):
+case (Syntax::SUM):
 {
     //FCLEX //Not used to increase speed
 
@@ -13,7 +13,7 @@ case (10/*sum*/):
 
     break;
 }
-case (11/*sub*/):
+case (Syntax::SUB):
 {
     //FCLEX //Not used to increase speed
 
@@ -28,7 +28,7 @@ case (11/*sub*/):
 
     break;
 }
-case (12/*mul*/):
+case (Syntax::MUL):
 {
     //FCLEX //Not used to increase speed
 
@@ -43,7 +43,7 @@ case (12/*mul*/):
 
     break;
 }
-case (13/*div*/):
+case (Syntax::DIV):
 {
     //FCLEX //Not used to increase speed
 
@@ -58,7 +58,7 @@ case (13/*div*/):
 
     break;
 }
-case (14/*mod*/):
+case (Syntax::MOD):
 {
     //FCLEX //Not used to increase speed
 

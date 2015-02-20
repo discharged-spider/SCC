@@ -3,24 +3,40 @@
 
 #include "..\\_ToTree\\Assem\\Assem.h"
 
+//==============================================================================
+
+void Preprocess (FILE* From, FILE* To, const char FromPath []);
+
+bool ReadSpecialSymbol (FILE* From, FILE* To, const char StopSymbol);
+
+//==============================================================================
+
 void Preprocess (FILE* From, FILE* To, const char FromPath [])
 {
+    int line = 1;
+
     bool MoveComment = false;
     bool EndComment  = false;
 
-    char LastC = '\n';
     char c = 0;
-    if (fread (&c, sizeof (c), 1, From) != 1) return;
+    if (!fread (&c, sizeof (c), 1, From)) return;
 
     while (true)
     {
+        if (c == '\n')
+        {
+            fprintf (To, "%c", c);
+
+            line ++;
+        }
+
         if (MoveComment == false && EndComment == false && c == '/')
         {
-            if (fread (&c, sizeof (c), 1, From) == 1 && c == '*')
+            if (fread (&c, sizeof (c), 1, From) && c == '*')
             {
                 MoveComment = true;
 
-                if (fread (&c, sizeof (c), 1, From) != 1) return;
+                if (!fread (&c, sizeof (c), 1, From)) return;
 
                 continue;
             }
@@ -32,12 +48,12 @@ void Preprocess (FILE* From, FILE* To, const char FromPath [])
         }
         if (MoveComment == true && EndComment == false && c == '*')
         {
-            if (fread (&c, sizeof (c), 1, From) == 1 && c == '/')
+            if (fread (&c, sizeof (c), 1, From) && c == '/')
             {
                 MoveComment = false;
                 if (MoveComment < 0) MoveComment = 0;
 
-                if (fread (&c, sizeof (c), 1, From) != 1) return;
+                if (!fread (&c, sizeof (c), 1, From)) return;
 
                 continue;
             }
@@ -50,11 +66,11 @@ void Preprocess (FILE* From, FILE* To, const char FromPath [])
 
         if (EndComment == false && MoveComment == false && c == '/')
         {
-            if (fread (&c, sizeof (c), 1, From) == 1 && c == '/')
+            if (fread (&c, sizeof (c), 1, From) && c == '/')
             {
                 EndComment = true;
 
-                if (fread (&c, sizeof (c), 1, From) != 1) return;
+                if (!fread (&c, sizeof (c), 1, From)) return;
 
                 continue;
             }
@@ -73,19 +89,15 @@ void Preprocess (FILE* From, FILE* To, const char FromPath [])
         {
             if (c == '\'')
             {
-                if (fread (&c, sizeof (c), 1, From) != 1) return;
-
-                if (c != '\\') fprintf (To, "%d", c);
-                else
+                if (!ReadSpecialSymbol (From, To, '\''))
                 {
-                    if (fread (&c, sizeof (c), 1, From) != 1) return;
-                    if (c == 'n') fprintf (To, "%d", '\n');
-                    if (c == '\'') fprintf (To, "%d", 39);
+                    if (!fread (&c, sizeof (c), 1, From)) return;
+
+                    if (c == '\'')
+                    {
+                        if (!fread (&c, sizeof (c), 1, From)) return;
+                    }
                 }
-
-                if (fread (&c, sizeof (c), 1, From) != 1) return;
-
-                if (c == 39 && fread (&c, sizeof (c), 1, From) != 1) return;
 
                 continue;
             }
@@ -94,95 +106,33 @@ void Preprocess (FILE* From, FILE* To, const char FromPath [])
             {
                 fprintf (To, "{");
 
-                bool Comment = false;
-
-                while (true)
+                while (ReadSpecialSymbol(From, To, '"'))
                 {
-                    if (fread (&c, sizeof (c), 1, From) != 1) return;
-
-                    if (c == '\\')
-                    {
-                        if (Comment == true)
-                        {
-                            Comment = false;
-
-                            fprintf (To, "%d, ", '\\');
-                        }
-                        else
-                        {
-                            Comment = true;
-                        }
-                    }
-                    else
-                    {
-                        if (c == '"')
-                        {
-                            if (Comment == true)
-                            {
-                                Comment = false;
-
-                                fprintf (To, "%d, ", '"');
-                            }
-                            else
-                            {
-                                fprintf (To, "0}");
-
-                                break;
-                            }
-                        }
-                        else
-                        {
-                            if (Comment == true)
-                            {
-                                Comment = false;
-
-                                if (c == 'n') fprintf (To, "%d, ", '\n');
-
-                                if ('0' <= c && c <= '9')
-                                {
-                                    for (int i = 0; i < 3; i ++)
-                                    {
-                                        fprintf (To, "%c", c);
-
-                                        if (fread (&c, sizeof (c), 1, From) != 1) return;
-
-                                        if ('0' > c || c > '9' || i == 2)
-                                        {
-                                            fseek (From, -1, SEEK_CUR);
-                                            break;
-                                        }
-                                    }
-
-                                    fprintf (To, ", ");
-                                }
-                            }
-                            else fprintf (To, "%d, ", c);
-                        }
-                    }
+                    fprintf (To, ", ");
                 }
 
-                if (fread (&c, sizeof (c), 1, From) != 1) return;
+                fprintf (To, "0}");
+
+                if (!fread (&c, sizeof (c), 1, From)) return;
+
                 continue;
             }
 
             if (c == '#')
             {
-                char Word [60] = "";
+                string Word;
                 EndComment = true;
 
-                if (!ReadWord (From, Word)) return;
+                if (!ReadWord (From, Word, &line)) return;
 
-                if (strcmp (Word, "include") == 0)
+                if (Word == "include")
                 {
-                    if (!ReadWord (From, Word)) return;
+                    if (!ReadWord (From, Word, &line)) return;
 
                     if (Word [0] == '"')
                     {
-                        for (int i = 1; Word [i] != 0; i ++)
-                        {
-                           if (Word [i + 1] == 0) Word [i] = 0;
-                           Word [i - 1] = Word [i];
-                        }
+                        Word.erase (Word.begin ());
+                        Word.erase (Word.end () - 1);
                     }
 
                     string FileName = FromPath;
@@ -191,41 +141,76 @@ void Preprocess (FILE* From, FILE* To, const char FromPath [])
                     FILE* File = fopen (FileName.c_str (), "rb");
                     if (!File) throw TH_ERROR "Unknown #include %s", FileName.c_str ());
 
+                    fprintf (To, "# %d \"%s\"\n", 0, FileName.c_str ());
+
                     Preprocess (File, To, FromPath);
+
+                    if (c == '\n')
+                    {
+                        fprintf (To, "\n");
+                        line ++;
+                    }
+
+                    fprintf (To, "\n# %d \"%s\"", line, "main");
 
                     fclose (File);
 
-                    fprintf (To, "\n");
-
-
                     continue;
-                }
-
-                if (strcmp (Word, "end") == 0)
-                {
-                    return ;
                 }
 
                 continue;
             }
 
-            if (LastC == '\n')
+            if (c != '\n'&& c != '\r')
             {
-                if (c != '\n'&& c != '\r')
-                {
-                    LastC = c;
-                    fprintf (To, "%c", c);
-                }
-            }
-            else
-            {
-                LastC = c;
                 fprintf (To, "%c", c);
             }
         }
 
-        if (fread (&c, sizeof (c), 1, From) != 1) return;
+        if (!fread (&c, sizeof (c), 1, From)) return;
     }
+}
+
+bool ReadSpecialSymbol (FILE* From, FILE* To, const char StopSymbol)
+{
+
+    char c = 0;
+    if (fread (&c, sizeof (c), 1, From) != 1) return true;
+
+    if (c == StopSymbol) return true;
+
+    if (c == '\\')
+    {
+        if (fread (&c, sizeof (c), 1, From) != 1) return true;
+
+        if (c == 'n') fprintf (To, "%d", '\n');
+        if (c == 'r') fprintf (To, "%d", '\r');
+        if (c == 't') fprintf (To, "%d", '\t');
+        if (c == 'v') fprintf (To, "%d", '\v');
+
+        if (c == '\\') fprintf (To, "%d", '\\');
+        if (c == '\'') fprintf (To, "%d", '\'');
+        if (c == '\"') fprintf (To, "%d", '\"');
+
+        if ('0' <= c && c <= '9')
+        {
+            int n = c - '0';
+            for (int i = 0; i < 2; i ++)
+            {
+                if (fread (&c, sizeof (c), 1, From) != 1) break;
+                n *= 10;
+                n += c - '0';
+            }
+
+            fprintf (To, "%d", n);
+        }
+
+        return false;
+    }
+
+    fprintf (To, "%d", c);
+
+    return false;
 }
 
 #endif

@@ -14,7 +14,14 @@ enum ExtraBaseTreeDesc
     N_DEL = 11,
     N_NATIVE = 12,
 
-    N_EQ  = 20,
+    N_EQ      = 20,
+    N_INCR    = 21, // ++
+    N_DECR    = 22, // --
+    N_SUM_EQ  = 23, // +=
+    N_SUB_EQ  = 24, // -=
+    N_MUL_EQ  = 25, // *=
+    N_DIV_EQ  = 26, // /=
+    N_MOD_EQ  = 27, // %=
 
     N_SUM = 30,
     N_SUB = 31,

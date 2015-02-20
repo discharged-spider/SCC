@@ -25,14 +25,14 @@ bool CheckModules (string Way);
 
 int GetType (const char File []);
 
-string ComandFileToTree (int From, const char FromName [], const char ToName [], const char ToInfoName [], const char ErrorOutputName [], string Way);
-string ComandOptimazeTree (const char FromName [], const char ToInfoName [], const char ErrorOutputName [], string Way);
+string ComandFileToTree (int From, const char FromName [], const char ToName [], const char ErrorOutputName [], string Way, string Params);
+string ComandOptimazeTree (const char FromName [], const char ErrorOutputName [], string Way, string Params);
 string ComandInfoFromTree (const char FromName [], const char ToInfoName [], const char ErrorOutputName [], string Way);
-string ComandTreeToFile (int To, const char FromName [], const char FromInfoName [], const char ToName [], const char ErrorOutputName [], string Way);
+string ComandTreeToFile (int To, const char FromName [], const char FromInfoName [], const char ToName [], const char ErrorOutputName [], string Way, string Params);
 
 bool CheckError (const char ErrorOutputName []);
 
-bool SCC_Compile (int From, int To, const char FromName [], const char ToName [], const char ErrorOutputName [], string Way, bool UseOptimizator);
+bool SCC_Compile (int From, int To, const char FromName [], const char ToName [], const char ErrorOutputName [], string Way, bool UseOptimizator, string FrontEndParams, string OptimazerParams, string BackEndParams);
 
 int main (int ArgN, char** ARG)
 {
@@ -40,13 +40,15 @@ int main (int ArgN, char** ARG)
     {
         printf ("%s help.\n", PROGRAM_NAME);
         printf ("Arguments:\n");
-        printf ("[] - not requide params\n");
         printf ("input_file_name\n");
         printf ("-i [-scc_c || -scc_spl] /*input type*/\n");
         printf ("-o output_file_name (default = \"Output.txt\")\n");
         printf ("-m [-scc_c || -scc_asm || -scc_new_asm || -scc_spl] /*output type*/\n");
         printf ("-e error_output_file_name (default = \"Error.txt\")\n");
         printf ("-no - non optimaze (don't use optimizator) \n");
+        printf ("-fp[ PARAMETERS ] - front-end parameters\n");
+        printf ("-op[ PARAMETERS ] - optimazer parameters\n");
+        printf ("-bp[ PARAMETERS ] - back-end parameters\n");
         exit (0);
     }
 
@@ -65,6 +67,8 @@ int main (int ArgN, char** ARG)
     char ErrorFileName [] = "Error.txt";
 
     bool UseOptimizator = true;
+
+    string FrontEndParams, OptimazerParams, BackEndParams;
 
     try
     {
@@ -122,6 +126,52 @@ int main (int ArgN, char** ARG)
                 continue;
             }
 
+            if (strcmp (ARG[i], "-fp[") == 0)
+            {
+                while (strcmp (ARG[i], "]") != 0)
+                {
+                    if (i == ArgN) throw TH_ERROR "Need ']'.");
+
+                    FrontEndParams += " ";
+                    FrontEndParams += ARG [i];
+                    FrontEndParams += " ";
+
+                    i ++;
+                }
+
+                continue;
+            }
+            if (strcmp (ARG[i], "-op[") == 0)
+            {
+                while (strcmp (ARG[i], "]") != 0)
+                {
+                    if (i == ArgN) throw TH_ERROR "Need ']'.");
+
+                    OptimazerParams += " ";
+                    OptimazerParams += ARG [i];
+                    OptimazerParams += " ";
+
+                    i ++;
+                }
+
+                continue;
+            }
+            if (strcmp (ARG[i], "-bp[") == 0)
+            {
+                while (strcmp (ARG[i], "]") != 0)
+                {
+                    if (i == ArgN) throw TH_ERROR "Need ']'.");
+
+                    BackEndParams += " ";
+                    BackEndParams += ARG [i];
+                    BackEndParams += " ";
+
+                    i ++;
+                }
+
+                continue;
+            }
+
             InputNumber = i;
             if (InputType == -1) InputType = GetType (ARG [i]);
         }
@@ -131,7 +181,7 @@ int main (int ArgN, char** ARG)
         if (OutputType == -1) throw TH_ERROR "Can't match output type, try use -m.");
         if (InputType == -1)  throw TH_ERROR "Can't match input type, try use -i.");
 
-        if (!SCC_Compile (InputType, OutputType, ARG [InputNumber], (OutputNumber == 0)? OutputFileName : ARG [OutputNumber], (ErrorOutputNumber == 0)? ErrorFileName : ARG [ErrorOutputNumber], Way, UseOptimizator)) throw TH_ERROR "Look ErrorOutputFile.");
+        if (!SCC_Compile (InputType, OutputType, ARG [InputNumber], (OutputNumber == 0)? OutputFileName : ARG [OutputNumber], (ErrorOutputNumber == 0)? ErrorFileName : ARG [ErrorOutputNumber], Way, UseOptimizator, FrontEndParams, OptimazerParams, BackEndParams)) throw TH_ERROR "Look ErrorOutputFile.");
 
         Temp = Way;
         Temp += TEMP_OUTPUT;
@@ -145,13 +195,15 @@ int main (int ArgN, char** ARG)
 
         FILE* ErrorOutput = fopen ((ErrorOutputNumber == 0)? ErrorFileName : ARG [ErrorOutputNumber], "ab");
         fprintf (ErrorOutput, "%s", Error.ErrorText_);
+        fclose (ErrorOutput);
+
     }
     catch (...)
     {
         printf ("Unknown error");
     }
 
-    _fcloseall ();
+    //_fcloseall ();
 }
 
 bool CheckModules (string Way)
@@ -214,7 +266,7 @@ int GetType (const char File [])
     return Return;
 }
 
-string ComandFileToTree (int From, const char FromName [], const char ToName [], const char ErrorOutputName [], string Way)
+string ComandFileToTree (int From, const char FromName [], const char ToName [], const char ErrorOutputName [], string Way, string Params)
 {
     string Comand = "\"";
     Comand += Way;
@@ -248,6 +300,9 @@ string ComandFileToTree (int From, const char FromName [], const char ToName [],
 
     Comand += "-e ";
     Comand += ErrorOutputName;
+    Comand += " ";
+
+    Comand += Params;
 
     Comand += " >> ";
     Comand += Way;
@@ -256,7 +311,7 @@ string ComandFileToTree (int From, const char FromName [], const char ToName [],
     return Comand;
 }
 
-string ComandOptimazeTree (const char FromName [], const char ErrorOutputName [], string Way)
+string ComandOptimazeTree (const char FromName [], const char ErrorOutputName [], string Way, string Params)
 {
     string Comand = "\"";
     Comand += Way;
@@ -268,6 +323,9 @@ string ComandOptimazeTree (const char FromName [], const char ErrorOutputName []
 
     Comand += "-e ";
     Comand += ErrorOutputName;
+    Comand += " ";
+
+    Comand += Params;
 
     Comand += " >> ";
     Comand += Way;
@@ -300,7 +358,7 @@ string ComandInfoFromTree (const char FromName [], const char ToInfoName [], con
     return Comand;
 }
 
-string ComandTreeToFile (int To, const char FromName [], const char FromInfoName [], const char ToName [], const char ErrorOutputName [], string Way)
+string ComandTreeToFile (int To, const char FromName [], const char FromInfoName [], const char ToName [], const char ErrorOutputName [], string Way, string Params)
 {
     string Comand = "\"";
     Comand += Way;
@@ -350,6 +408,9 @@ string ComandTreeToFile (int To, const char FromName [], const char FromInfoName
 
     Comand += "-e ";
     Comand += ErrorOutputName;
+    Comand += " ";
+
+    Comand += Params;
 
     Comand += " >> ";
     Comand += Way;
@@ -370,7 +431,7 @@ bool CheckError (const char ErrorOutputName [])
     return Return;
 }
 
-bool SCC_Compile (int From, int To, const char FromName [], const char ToName [], const char ErrorOutputName [], string Way, bool UseOptimizator)
+bool SCC_Compile (int From, int To, const char FromName [], const char ToName [], const char ErrorOutputName [], string Way, bool UseOptimizator, string FrontEndParams, string OptimazerParams, string BackEndParams)
 {
     #define TEMP_TREE "TEMP\\Temp.scc_tree"
     #define TEMP_INFO "TEMP\\Temp.scc_tree_info"
@@ -392,7 +453,7 @@ bool SCC_Compile (int From, int To, const char FromName [], const char ToName []
 
     Temp1 = Way;
     Temp1 += TEMP_TREE;
-    system (ComandFileToTree (From, FromName, Temp1.c_str()/*TEMP_TREE*/, ErrorOutputName, Way).c_str ());
+    system (ComandFileToTree (From, FromName, Temp1.c_str()/*TEMP_TREE*/, ErrorOutputName, Way, FrontEndParams).c_str ());
     if (CheckError (ErrorOutputName)) return false;
 
     Temp1 = Way;
@@ -402,7 +463,7 @@ bool SCC_Compile (int From, int To, const char FromName [], const char ToName []
     {
         Temp2 = Way;
         Temp2 += TEMP_INFO;
-        system (ComandOptimazeTree (Temp1.c_str()/*TEMP_TREE*/, ErrorOutputName, Way).c_str ());
+        system (ComandOptimazeTree (Temp1.c_str()/*TEMP_TREE*/, ErrorOutputName, Way, OptimazerParams).c_str ());
         if (CheckError (ErrorOutputName)) return false;
     }
 
@@ -419,7 +480,7 @@ bool SCC_Compile (int From, int To, const char FromName [], const char ToName []
 
     Temp2 = Way;
     Temp2 += TEMP_INFO;
-    system (ComandTreeToFile (To, Temp1.c_str()/*TEMP_TREE*/, Temp2.c_str()/*TEMP_INFO*/, ToName, ErrorOutputName, Way).c_str ());
+    system (ComandTreeToFile (To, Temp1.c_str()/*TEMP_TREE*/, Temp2.c_str()/*TEMP_INFO*/, ToName, ErrorOutputName, Way, BackEndParams).c_str ());
     if (CheckError (ErrorOutputName)) return false;
 
     return true;

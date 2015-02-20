@@ -1,4 +1,4 @@
-case (30/*equal*/):
+case (Syntax::EQUAL):
 {
     FCLEX
 
@@ -54,7 +54,7 @@ case (30/*equal*/):
 
     break;
 }
-case (31/*more*/):
+case (Syntax::MORE):
 {
     FCLEX
 
@@ -110,7 +110,7 @@ case (31/*more*/):
 
     break;
 }
-case (32/*less*/):
+case (Syntax::LESS):
 {
     FCLEX
 
@@ -166,7 +166,7 @@ case (32/*less*/):
 
     break;
 }
-case (33/*not*/):
+case (Syntax::NOT):
 {
     FCLEX
 
@@ -219,7 +219,7 @@ case (33/*not*/):
 
     break;
 }
-case (34/*ifnot*/):
+case (Syntax::IFNOT):
 {
     FCLEX
 

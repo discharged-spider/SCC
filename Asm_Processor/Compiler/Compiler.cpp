@@ -96,7 +96,7 @@ int main (int ArgN, char** ARG)
         fclose (Input);
         remove ("Program.scc_pre_asm");
 
-        int Mode = (JITMode)? 'J' + 'I' + 'T' : 'P' + 'R' + 'O' + 'C';
+        int Mode = (JITMode)? Syntax::JIT_MODE : Syntax::PROC_MODE;
         fwrite (&Mode, sizeof (int), 1, Output);
 
         if (JITMode)
@@ -123,6 +123,7 @@ int main (int ArgN, char** ARG)
 
         if (!ErrorOutput) ErrorOutput = fopen ("Error.txt", "ab");
         fprintf (ErrorOutput, "%s", Error.ErrorText_);
+        fclose (ErrorOutput);
     }
     catch (...)
     {
@@ -130,5 +131,7 @@ int main (int ArgN, char** ARG)
     }
 
     remove ("Program.scc_pre_c");
-    _fcloseall ();
+    //_fcloseall ();
+
+    return 0;
 }

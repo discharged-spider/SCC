@@ -26,7 +26,7 @@ namespace JITMemory
     void Clear ();
 
     void Dump ();
-};
+}
 
 //-------------------------------------------------------------------------------------------------
 
@@ -153,7 +153,7 @@ void JITMemory::Dump ()
     printf ("<<<<==MEMORY_DUMP==>>>>>\n");
     for (unsigned int i = 0; i < JITMemory::Memory_.size (); i ++)
     {
-       printf ("%lg[%s] ", JITMemory::Memory_ [i], (JITMemory::FreeMemory_ [i])? "V" : "X");
+       printf ("%g[%s] ", JITMemory::Memory_ [i], (JITMemory::FreeMemory_ [i])? "V" : "X");
     }
     printf ("\n");
 }

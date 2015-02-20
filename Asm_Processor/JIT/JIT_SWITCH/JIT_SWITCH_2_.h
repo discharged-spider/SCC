@@ -1,4 +1,4 @@
-case (20/*:*/):
+case (Syntax::MARK):
 {
     i ++;
 
@@ -11,7 +11,7 @@ case (20/*:*/):
 
     break;
 }
-case (21/*goto*/):
+case (Syntax::GOTO):
 {
     i ++;
 
@@ -40,7 +40,7 @@ case (21/*goto*/):
 
     break;
 }
-case (22/*call*/):
+case (Syntax::CALL):
 {
     i ++;
 
@@ -92,7 +92,7 @@ case (22/*call*/):
 
     break;
 }
-case (23/*end*/):
+case (Syntax::END):
 {
     RET_NEAR
 

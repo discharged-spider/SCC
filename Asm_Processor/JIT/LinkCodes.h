@@ -9,4 +9,9 @@
 #define LINK_ECHO 50
 #define LINK_GET 51
 
+#define LINK_LOG_GET_VAR 60
+#define LINK_LOG_GET_ARR 61
+#define LINK_LOG_SET_VAR 62
+#define LINK_LOG_SET_ARR 63
+
 #endif

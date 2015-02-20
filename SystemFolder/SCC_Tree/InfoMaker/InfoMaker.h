@@ -414,9 +414,9 @@ void LinkVarArrLnk (newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& N
     {
         if (Data.Descriptor == N_LNK && FunMID.InParams == false) throw TH_ERROR "You can use links only in functions!");
 
-        if (Data.Descriptor == N_VAR) if (VarMID.Counter.Find (Data.Name) != -1) throw TH_ERROR "This var name was already used(%s)!", Data.Name);
-        if (Data.Descriptor == N_ARR) if (ArrMID.Counter.Find (Data.Name) != -1) throw TH_ERROR "This arr name was already used(%s)!", Data.Name);
-        if (Data.Descriptor == N_LNK) if (VarMID.Counter.Find (Data.Name) != -1) throw TH_ERROR "This var name was already used(%s)!", Data.Name);
+        if (Data.Descriptor == N_VAR) if (VarMID.Counter.Find (Data.Name) != -1) throw TH_ERROR "This var name was already used(%s)!", Data.GetName ());
+        if (Data.Descriptor == N_ARR) if (ArrMID.Counter.Find (Data.Name) != -1) throw TH_ERROR "This arr name was already used(%s)!", Data.GetName ());
+        if (Data.Descriptor == N_LNK) if (VarMID.Counter.Find (Data.Name) != -1) throw TH_ERROR "This var name was already used(%s)!", Data.GetName ());
 
         if (Data.Descriptor == N_VAR) NodeInfo [Tree.CurrentNode ()].Addr = VarMID.Counter.Add (Data.Name);
         if (Data.Descriptor == N_ARR) NodeInfo [Tree.CurrentNode ()].Addr = ArrMID.Counter.Add (Data.Name);
@@ -485,8 +485,8 @@ void LinkVarArrLnk (newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& N
             Tree.Up ();
         }
 
-        if (Data.Descriptor == N_VAR) if (VarMID.Counter.Find (Data.Name) == -1) throw TH_ERROR "Unknown var name(%s)!", Data.Name);
-        if (Data.Descriptor == N_ARR) if (ArrMID.Counter.Find (Data.Name) == -1) throw TH_ERROR "Unknown arr name(%s)!", Data.Name);
+        if (Data.Descriptor == N_VAR) if (VarMID.Counter.Find (Data.Name) == -1) throw TH_ERROR "Unknown var name(%s)!", Data.GetName ());
+        if (Data.Descriptor == N_ARR) if (ArrMID.Counter.Find (Data.Name) == -1) throw TH_ERROR "Unknown arr name(%s)!", Data.GetName ());
 
         if (Data.Descriptor == N_VAR) NodeInfo [Tree.CurrentNode ()].Addr = VarMID.Counter.Find (Data.Name);
         if (Data.Descriptor == N_ARR) NodeInfo [Tree.CurrentNode ()].Addr = ArrMID.Counter.Find (Data.Name);
@@ -518,7 +518,7 @@ void LinkMark (newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& NodeIn
     {
         Info.MarkNumber ++;
 
-        if (MarMID.Counter.Find (Data.Name) != -1) throw TH_ERROR "This mark name was already used(%s)!", Data.Name);
+        if (MarMID.Counter.Find (Data.Name) != -1) throw TH_ERROR "This mark name was already used(%s)!", Data.GetName ());
 
         NodeInfo [Tree.CurrentNode ()].ID = MarMID.Counter.Add (Data.Name);
     }
@@ -530,13 +530,13 @@ void LinkFunc (newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& NodeIn
 
     if (State == 1 || State == 3)
     {
-        printf ("Add %s\n", Data.Name);
+        printf ("Add %s\n", Data.GetName ());
 
-        if (State == 1 && FunMID.InFunc == true) throw TH_ERROR "Don't try to create func in func (%s)", Data.Name);
+        if (State == 1 && FunMID.InFunc == true) throw TH_ERROR "Don't try to create func in func (%s)", Data.GetName ());
 
         if (State == 1 && !Tree.CanDownR ())
         {
-            if (FunMID.Counter.Find (Data.Name) != -1) throw TH_ERROR "This func name was already used(%s)!", Data.Name);
+            if (FunMID.Counter.Find (Data.Name) != -1) throw TH_ERROR "This func name was already used(%s)!", Data.GetName ());
 
             int ID = FunMID.Counter.Add (Data.Name);
 
@@ -587,7 +587,7 @@ void LinkFunc (newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& NodeIn
                     newTree Params;
                     CopyTreeToTree (Tree, Params);
                     OptimizeParamTree (Params);
-                    if (!FuncParamsComp (FunMID.Params [ID], Params, NodeInfo))  throw TH_ERROR "Function (%s) must have simular params!", Data.Name);
+                    if (!FuncParamsComp (FunMID.Params [ID], Params, NodeInfo))  throw TH_ERROR "Function (%s) must have simular params!", Data.GetName ());
                     Tree.Up ();
                 }
 
@@ -643,7 +643,7 @@ void LinkFunc (newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& NodeIn
     }
     if (State == 0)
     {
-        if (FunMID.Counter.Find (Data.Name) == -1) throw TH_ERROR "Unknown func name(%s)!", Data.Name);
+        if (FunMID.Counter.Find (Data.Name) == -1) throw TH_ERROR "Unknown func name(%s)!", Data.GetName ());
 
         NodeInfo [Tree.CurrentNode ()].ID = FunMID.Counter.Find (Data.Name);
 
@@ -652,7 +652,7 @@ void LinkFunc (newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& NodeIn
         if (Tree.CanDownL ())
         {
             Tree.DownL ();
-            if (!FuncParamsComp (FunMID.Params [ID], Tree, NodeInfo))  throw TH_ERROR "Function (%s) must have simular params!", Data.Name);
+            if (!FuncParamsComp (FunMID.Params [ID], Tree, NodeInfo))  throw TH_ERROR "Function (%s) must have simular params!", Data.GetName ());
 
             LinkNode (Tree, Info, NodeInfo, State, VarMID, ArrMID, FunMID, MarMID);
 
@@ -660,7 +660,7 @@ void LinkFunc (newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& NodeIn
         }
         else
         {
-            if (!FunMID.Params [ID].Empty ()) throw TH_ERROR "Function (%s) must have simular params!", Data.Name);
+            if (!FunMID.Params [ID].Empty ()) throw TH_ERROR "Function (%s) must have simular params!", Data.GetName ());
         }
 
         return;
@@ -779,14 +779,14 @@ void PostLinkMarkFunc (newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>
 
         if (Data.Descriptor == N_GOTO)
         {
-            if (MarMID.Counter.Find (Data.Name) == -1) throw TH_ERROR "Unknown mark name(%s)!", Data.Name);
+            if (MarMID.Counter.Find (Data.Name) == -1) throw TH_ERROR "Unknown mark name(%s)!", Data.GetName ());
 
             NodeInfo [i].ID = MarMID.Counter.Find (Data.Name);
         }
 
         if (Data.Descriptor == N_FUN)
         {
-            if (FunMID.Headers [NodeInfo [i].ID] == -1) throw TH_ERROR "Only prototype for (%s)!", Data.Name);
+            if (FunMID.Headers [NodeInfo [i].ID] == -1) throw TH_ERROR "Only prototype for (%s)!", Data.GetName ());
 
             NodeInfo [i].Addr = FunMID.Headers [NodeInfo [i].ID];
         }

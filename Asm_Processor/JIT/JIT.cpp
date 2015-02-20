@@ -17,6 +17,9 @@ int main (int ArgN, char** ARG)
         printf ("Arguments:\n");
         printf ("-i input_file_name (default = \"Program.scc_bin\")\n");
         printf ("-e error_output_file_name (default = \"Error.txt\")\n");
+        printf ("-fi file_input_name - to get input by file\n");
+        printf ("-fo file_output_name - to get input by file\n");
+        printf ("-insp log_file_name - to enable vars and arrs get/set logging\n");
         exit (0);
     }
 
@@ -27,6 +30,10 @@ int main (int ArgN, char** ARG)
     char InputName [] = "Program.scc_bin";
     FILE* Input = NULL;
     FILE* ErrorOutput = NULL;
+    FILE* VarsArrsLog = NULL;
+
+    FILE* FInput = NULL;
+    FILE* FOutput = NULL;
 
     try
     {
@@ -37,16 +44,35 @@ int main (int ArgN, char** ARG)
                 i ++;
                 if (i >= ArgN) throw TH_ERROR "Sudden end after argument.");
 
-                if (Input) fclose (Input);
-                Input = fopen (ARG[i], "rb");
+                PARAMS_FILE_OPEN (Input, ARG[i], "rb")
             }
             if (strcmp (ARG[i], "-e") == 0)
             {
                 i ++;
                 if (i >= ArgN) throw TH_ERROR "Sudden end after argument.");
 
-                if (ErrorOutput) fclose (ErrorOutput);
-                ErrorOutput = fopen (ARG[i], "ab");
+                PARAMS_FILE_OPEN (ErrorOutput, ARG[i], "ab")
+            }
+            if (strcmp (ARG[i], "-insp") == 0)
+            {
+                i ++;
+                if (i >= ArgN) throw TH_ERROR "Sudden end after argument.");
+
+                PARAMS_FILE_OPEN (VarsArrsLog, ARG[i], "wb")
+            }
+            if (strcmp (ARG[i], "-fi") == 0)
+            {
+                i ++;
+                if (i >= ArgN) throw TH_ERROR "Sudden end after argument.");
+
+                PARAMS_FILE_OPEN (FInput, ARG[i], "rb")
+            }
+            if (strcmp (ARG[i], "-fo") == 0)
+            {
+                i ++;
+                if (i >= ArgN) throw TH_ERROR "Sudden end after argument.");
+
+                PARAMS_FILE_OPEN (FOutput, ARG[i], "wb")
             }
         }
 
@@ -55,10 +81,13 @@ int main (int ArgN, char** ARG)
 
         if (!ErrorOutput) ErrorOutput = fopen ("Error.txt", "ab");
 
-        int Mode = false;
+        int Mode = 0;
         if (!fread (&Mode, sizeof (int), 1, Input)) throw TH_ERROR "Input is empty");
 
-        if (Mode != 'J' + 'I' + 'T') throw TH_ERROR "I can run only scc_jit files (not scc_exe)");
+        if (Mode != Syntax::JIT_MODE) throw TH_ERROR "I can run only scc_jit files (not scc_exe)");
+
+        JITLinkFunctions::input = FInput;
+        JITLinkFunctions::output = FOutput;
 
         int ProgramSize = 0;
         vector <double> Program;
@@ -72,7 +101,7 @@ int main (int ArgN, char** ARG)
 
         stack <unsigned int> ToLink;
 
-        Compile (&Program [0], ProgramSize, BIN, &Size, ToLink);
+        Compile (&Program [0], ProgramSize, BIN, &Size, ToLink, VarsArrsLog != NULL);
 
         Link (BIN, Size, ToLink, STANDART_LINK_FUNCTIONS);
 
@@ -80,7 +109,7 @@ int main (int ArgN, char** ARG)
 
         ST_EXECUTE (BIN);
 
-        fclose (Input);
+        if (VarsArrsLog) JITLinkFunctions::Inspector.save (VarsArrsLog);
 
         fclose (ErrorOutput);
     }
@@ -90,11 +119,13 @@ int main (int ArgN, char** ARG)
 
         if (!ErrorOutput) ErrorOutput = fopen ("Error.txt", "ab");
         fprintf (ErrorOutput, "%s", Error.ErrorText_);
+        fclose (ErrorOutput);
     }
     catch (...)
     {
         printf ("Unknown error");
     }
 
-    _fcloseall ();
+    //_fcloseall ();
+    return 0;
 }

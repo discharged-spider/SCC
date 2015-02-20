@@ -185,7 +185,7 @@ namespace DotterSystem
     newDotLinkStyle CurrentLinkStyle; //!< Текущий стиль ссылки.
 
     int Ind = 4; //!< Отступ перед строкой в кол-ве пробелов.
-};
+}
 using namespace DotterSystem;
 
 //==============================================================================

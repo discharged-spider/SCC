@@ -252,7 +252,6 @@ void GetAB (newTree& Tree, newNodeData Program [], int& Size, int& i)
 
     Tree.PopP ();
 
-
     #ifdef DEBUG
         printf ("Return from %s, Pos = %d\n", __PRETTY_FUNCTION__, i);
     #endif
@@ -1134,7 +1133,7 @@ void GetCA (newTree& Tree, newNodeData Program [], int& Size, int& i)
     #endif
 }
 
-//GetCB GetAG = GetAA
+//GetCB GetAG = GetAA || GetAG ++ || GetAG -- || GetAG += GetAA || GetAG -= GetAA || GetAG *= GetAA || GetAG /= GetAA || GetAG %= GetAA
 void GetCB (newTree& Tree, newNodeData Program [], int& Size, int& i)
 {
     #ifdef DEBUG
@@ -1151,19 +1150,28 @@ void GetCB (newTree& Tree, newNodeData Program [], int& Size, int& i)
 
     if (i >= Size) throw TH_ERROR "SUDDEN END");
 
-    if (Program [i].Descriptor != N_EQ)  throw TH_ERROR "Expected |=|.");
+    if (Program [i].Descriptor < N_EQ || Program [i].Descriptor > N_MOD_EQ)
+    {
+        throw TH_ERROR "Expected |=| or |++| or |--| or |+=| or |-=| or |*=| or |/=| or |%=|.");
+    }
 
     Tree.Set (Program [i]);
 
-    i ++;
+    if (Program [i].Descriptor != N_INCR && Program [i].Descriptor != N_DECR)
+    {
+        i ++;
+        if (i >= Size) throw TH_ERROR "SUDDEN END");
 
-    if (i >= Size) throw TH_ERROR "SUDDEN END");
+        Tree.DownR ();
 
-    Tree.DownR ();
+        GetAA (Tree, Program, Size, i);
 
-    GetAA (Tree, Program, Size, i);
-
-    Tree.Up ();
+        Tree.Up ();
+    }
+    else
+    {
+        i ++;
+    }
 
     #ifdef DEBUG
         printf ("Return from %s, Pos = %d\n", __PRETTY_FUNCTION__, i);

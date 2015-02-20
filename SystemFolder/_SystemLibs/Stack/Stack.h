@@ -194,7 +194,7 @@ VectorType& newVector<VectorType>::operator [] (const int i)
     assert (i > -1);
 
     //if (i >= Size_) SetSize (i + 1);
-    if (i >= Size_) SetSize ((i < 10)? 10 : (i * 1.5));
+    if (i >= Size_) SetSize ((i < 10)? 10 : (int)(i * 1.5));
 
     return *(Data_ + i);
 }
@@ -281,7 +281,8 @@ class newStack
 
 template <typename CellType>
 newStack<CellType>::newStack () :
-    CellNum_  (0)
+    CellNum_  (0),
+    Cell_ ()
 {
     assert (OK ());
 }
@@ -511,11 +512,11 @@ void DumpOut (char**  ToPrintf)
 }
 void DumpOut (double* ToPrintf)
 {
-    printf ("%lg", *ToPrintf);
+    printf ("%g", *ToPrintf);
 }
-void DumpOut (float*  ToPrintf)
+void DumpOut (float* ToPrintf)
 {
-    printf ("%lg", *ToPrintf);
+    printf ("%f", *ToPrintf);
 }
 void DumpOut (bool*      ToPrintf)
 {

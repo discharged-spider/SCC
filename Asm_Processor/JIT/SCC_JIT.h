@@ -12,20 +12,27 @@
 
 #include <time.h>
 
+#include "map"
+
 #define GetPTinMS ((double)clock() * (double)1000 / (double)CLOCKS_PER_SEC)
 
-#include "..\\..\\SystemFolder\\_SystemLibs\\Throw\\Throw.h"
+#include "..\..\SystemFolder\_SystemLibs\Throw\Throw.h"
+
+#include "..\Syntax\Syntax.h"
 
 #include "JITLinkFunc.h"
 
-using namespace std;
+using std::map;
+using std::vector;
 
 void Load (FILE* file, vector <double>& Program, int* ProgramSize);
 
-void Compile (double Program [], int ProgramSize, vector<unsigned char>& Output, unsigned int* OutputSize, stack <unsigned int>& ToLink);
+void Compile (double Program [], int ProgramSize, vector<unsigned char>& Output, unsigned int* OutputSize, stack <unsigned int>& ToLink, bool UseInspector);
 
-#define STANDART_LINK_FUNCTIONS JITLinkFunctions::Echo, JITLinkFunctions::Get, JITLinkFunctions::JITMemory::PushMS, JITLinkFunctions::JITMemory::PopMS, JITLinkFunctions::JITMemory::Add, JITLinkFunctions::JITMemory::Rem
-void Link (vector<unsigned char>& Program, unsigned int Size, stack <unsigned int> ToLink, void Echo (), void Get (), void PushMS (), void PopMS (), void Add (), void Rem ());
+void InitFPU (vector<unsigned char>& Output, unsigned int* OutputSize);
+
+#define STANDART_LINK_FUNCTIONS JITLinkFunctions::getFunctions ()
+void Link (vector<unsigned char>& Program, unsigned int Size, stack <unsigned int> ToLink, map <int, void*> functions);
 
 #define ST_EXECUTE(Program) Execute (Program, JITLinkFunctions::JITMemory::Clear)
 void Execute (vector<unsigned char> Program, void ClearMemory ());
@@ -46,7 +53,7 @@ void Load (FILE* file, vector <double>& Program, int* ProgramSize)
     }
 }
 
-void Compile (double Program [], int ProgramSize, vector<unsigned char>& Output, unsigned int* OutputSize, stack <unsigned int>& ToLink)
+void Compile (double Program [], int ProgramSize, vector<unsigned char>& Output, unsigned int* OutputSize, stack <unsigned int>& ToLink, bool UseInspector)
 {
     *OutputSize = 0;
 
@@ -60,7 +67,7 @@ void Compile (double Program [], int ProgramSize, vector<unsigned char>& Output,
     #include "JITCodes.h"
     #include "LinkCodes.h"
 
-    FINIT //Ony at start
+    InitFPU (Output, OutputSize);
 
     MOV_32_REG (EAX)
     int PROTECTOR = -1;
@@ -90,7 +97,7 @@ void Compile (double Program [], int ProgramSize, vector<unsigned char>& Output,
         PUSH_BYTE (DATA_TO_CHAR[3])
 
         MOV_32_REG (EAX)
-        unsigned int ADDR = (int)DebugOutComand;
+        unsigned int ADDR = (int)DebugOutCommand;
         unsigned char* ADDR_TO_CHAR = (unsigned char*)&ADDR;
         PUSH_BYTE (ADDR_TO_CHAR[0])
         PUSH_BYTE (ADDR_TO_CHAR[1])
@@ -115,9 +122,11 @@ void Compile (double Program [], int ProgramSize, vector<unsigned char>& Output,
 
             #include "JIT_SWITCH/JIT_SWITCH_5_.h" //All comands >= 50 < 60
 
+            #include "JIT_SWITCH/JIT_SWITCH_6_.h" //All comands >= 60 < 70
+
             default:
             {
-                printf ("Unknown comand(%lg)!\n", Program [i]);
+                printf ("Unknown command(%g)!\n", Program [i]);
 
                 break;
             }
@@ -148,59 +157,65 @@ void Compile (double Program [], int ProgramSize, vector<unsigned char>& Output,
     }
 }
 
-void Link (vector<unsigned char>& Program, unsigned int Size, stack <unsigned int> ToLink, void Echo (), void Get (), void PushMS (), void PopMS (), void Add (), void Rem ())
+void InitFPU (vector<unsigned char>& Output, unsigned int* OutputSize)
+{
+    FINIT //Only at start
+
+    FCLEX
+
+    return;
+
+    /*
+    Set FPU control word (for right %):
+
+    push AX
+
+    fstcw word ptr [ESP]
+    and word ptr [ESP], 1001111111111b
+    or  word ptr [ESP], 0110000000000b
+    fldcw word ptr [ESP]
+
+    pop AX
+
+    */
+    //{
+
+    PUSH_BYTE (0x66)
+    PUSH_BYTE (0x50)
+
+    PUSH_BYTE (0xD9)
+    PUSH_BYTE (0x3C)
+    PUSH_BYTE (0x24)
+    PUSH_BYTE (0x66)
+    PUSH_BYTE (0x81)
+    PUSH_BYTE (0x24)
+    PUSH_BYTE (0x24)
+    PUSH_BYTE (0xFF)
+    PUSH_BYTE (0x13)
+    PUSH_BYTE (0x66)
+    PUSH_BYTE (0x81)
+    PUSH_BYTE (0x0C)
+    PUSH_BYTE (0x24)
+    PUSH_BYTE (0x00)
+    PUSH_BYTE (0x0C)
+    PUSH_BYTE (0xD9)
+    PUSH_BYTE (0x2C)
+    PUSH_BYTE (0x24)
+
+    PUSH_BYTE (0x66)
+    PUSH_BYTE (0x58)
+
+    //}
+}
+
+void Link (vector<unsigned char>& Program, unsigned int Size, stack <unsigned int> ToLink, map <int, void*> functions)
 {
     while (!ToLink.empty ())
     {
         unsigned int LinkN = *((unsigned int*)&Program[ToLink.top ()]);
 
         int TEMP = (int)NULL;
-        switch (LinkN)
-        {
-            case (LINK_PUSHMS):
-            {
-                TEMP = (int)(PushMS);
-
-                break;
-            }
-            case (LINK_POPMS):
-            {
-                TEMP = (int)PopMS;
-
-                break;
-            }
-            case (LINK_ADD):
-            {
-                TEMP = (int)Add;
-
-                break;
-            }
-            case (LINK_REM):
-            {
-                TEMP = (int)Rem;
-
-                break;
-            }
-
-            case (LINK_ECHO):
-            {
-                TEMP = (int)Echo;
-
-                break;
-            }
-            case (LINK_GET):
-            {
-                TEMP = (int)Get;
-
-                break;
-            }
-
-            default:
-            {
-                TEMP = (int)NULL;
-                break;
-            }
-        };
+        TEMP = (int)functions [LinkN];
 
         unsigned char* TEMP_TO_CHAR = (unsigned char*)&TEMP;
         Program [ToLink.top () + 0] = TEMP_TO_CHAR[0];
@@ -218,7 +233,7 @@ void Execute (vector<unsigned char> Program, void ClearMemory ())
 
     double TimeStart = GetPTinMS;
     printf ("<<<<===================>>>>\n");
-    __asm
+    __asm __volatile__
     (
         "call *%0"
         :
@@ -227,7 +242,7 @@ void Execute (vector<unsigned char> Program, void ClearMemory ())
     );
     printf ("\n<<<<===================>>>>\n");
     double TimeEnd = GetPTinMS;
-    printf ("Program done for %lg ms.\n", TimeEnd - TimeStart);
+    printf ("Program done for %g ms.\n", TimeEnd - TimeStart);
 }
 
 #endif

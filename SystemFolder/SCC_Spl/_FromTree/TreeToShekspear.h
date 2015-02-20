@@ -77,12 +77,12 @@ void AddGotoScene (FILE* To, int A, newTreeToShekspearData& ShData);
 
 void PushNumber (FILE* To, double Num, newTreeToShekspearData& ShData);
 
-void SetA (FILE* To, newTreeToShekspearData& ShData, int A);
+void SetA (FILE* To, newTreeToShekspearData& ShData, int A, int SelfModyfier = -1);
 void SaveA (FILE* To, newTreeToShekspearData& ShData, int A);
 void LoadA (FILE* To, newTreeToShekspearData& ShData, int A);
 
 bool LinearInstance (newTree& Tree);
-void SetVar (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& NodeInfo, newTreeToShekspearData& ShData, int A = -1, int PIA = IA);
+void SetVar (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& NodeInfo, newTreeToShekspearData& ShData, int A = -1, int PIA = IA, int SelfModyfier = -1);
 
 void PushArrIFunc (FILE* To, newTreeInfo& Info, newVector <newNodeInfo>& NodeInfo, newTreeToShekspearData& ShData, int A);
 
@@ -172,7 +172,7 @@ void CreateShekspearRec (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <
         return ;
     }
 
-    if (Data.Descriptor == N_EQ)
+    if (Data.Descriptor >= N_EQ && Data.Descriptor <= N_MOD_EQ)
     {
         Equal (To, Tree, Info, NodeInfo, ShData);
 
@@ -214,8 +214,8 @@ void CreateShekspearRec (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <
     if (Data.Descriptor == N_BREAK && ShData.CycleEnd != -1)
     {
         CreatePlace (To, ShData);
-        if (Ver (50)) fprintf (To, "    Let us ");
-        else             fprintf (To, "    We shall ");
+        if (rand_state (2) == 1) fprintf (To, "    Let us ");
+        if (rand_state (2) == 2) fprintf (To, "    We shall ");
         AddGotoScene (To, ShData.CycleEnd, ShData);
         fprintf (To, ".\n");
 
@@ -224,8 +224,8 @@ void CreateShekspearRec (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <
     if (Data.Descriptor == N_CONTINUE && ShData.CycleStart != -1)
     {
         CreatePlace (To, ShData);
-        if (Ver (50)) fprintf (To, "    Let us ");
-        else             fprintf (To, "    We shall ");
+        if (rand_state (2) == 1) fprintf (To, "    Let us ");
+        if (rand_state (2) == 2) fprintf (To, "    We shall ");
         AddGotoScene (To, ShData.CycleStart, ShData);
         fprintf (To, ".\n");
 
@@ -248,12 +248,12 @@ void CreateShekspearRec (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <
             CreateListener (To, RE, ShData);
 
             fprintf (To, "    You ");
-            if (Ver (50))
+            if (coin_toss ())
             {
                 fprintf (To, "are as ");
-                if (Ver (50))      AddRandListItem ("positive_adjective", To, ShData.Way);
-                else if (Ver (25)) AddRandListItem ("neutral_adjective", To, ShData.Way);
-                else               AddRandListItem ("negative_adjective", To, ShData.Way);
+                if (rand_state (3) == 1) AddRandListItem ("positive_adjective", To, ShData.Way);
+                if (rand_state (3) == 2) AddRandListItem ("neutral_adjective", To, ShData.Way);
+                if (rand_state (3) == 3) AddRandListItem ("negative_adjective", To, ShData.Way);
                 fprintf (To, " as ");
             }
 
@@ -268,8 +268,8 @@ void CreateShekspearRec (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <
 
         CreatePlace (To, ShData);
 
-        if (Ver(50)) fprintf (To, "    Let us back.\n");
-        else         fprintf (To, "    We shall back.\n");
+        if (rand_state (2) == 1) fprintf (To, "    Let us back.\n");
+        if (rand_state (2) == 2) fprintf (To, "    We shall back.\n");
 
         Tree.Up ();
 
@@ -320,7 +320,7 @@ void OutRoman (FILE* To, int Num)
         if (Num >= ArabArr [Arri])
         {
             Num -= ArabArr [Arri];
-            fprintf (To, RomanArr [Arri]);
+            fprintf (To, "%s", RomanArr [Arri]);
         }
         else
         {
@@ -518,14 +518,18 @@ void AddGotoScene (FILE* To, int A, newTreeToShekspearData& ShData)
 
 void PushNumber (FILE* To, double Num, newTreeToShekspearData& ShData)
 {
+    #define BIG_INT unsigned long
+
     #define MAX_POW 5
 
     #define DOUBLE_EQL(A, B) (fabs ((A) - (B)) <= DBL_EPSILON * fmax (fabs (A), fabs (B)))
-    #define IS_INT(A) (DOUBLE_EQL ((long long)(A), A))
+    #define IS_INT(A) (DOUBLE_EQL ((BIG_INT)(A), A))
+
+    #define DOUBLE_COMP(A, B) (DOUBLE_EQL (A, B)? 0 : ((A > B)? 1 : -1))
 
     if (!IS_INT (Num))
     {
-        if ((long long)Num != 0)
+        if ((BIG_INT)Num != 0)
         {
             fprintf (To, "the sum of ");
             PushNumber (To, floor (Num), ShData);
@@ -543,7 +547,7 @@ void PushNumber (FILE* To, double Num, newTreeToShekspearData& ShData)
         }
 
         fprintf (To, "the quotient between ");
-        PushNumber (To, (long long)Num, ShData);
+        PushNumber (To, (BIG_INT)Num, ShData);
         fprintf (To, " and ");
 
         while (pow > 1)
@@ -576,7 +580,7 @@ void PushNumber (FILE* To, double Num, newTreeToShekspearData& ShData)
     }
     else
     {
-        if (Num == 0)
+        if (DOUBLE_EQL(Num, 0))
         {
             AddRandListItem ("nothing", To, ShData.Way);
             return;
@@ -602,22 +606,21 @@ void PushNumber (FILE* To, double Num, newTreeToShekspearData& ShData)
                 fprintf (To, " and ");
             }
 
-            if (SquareNear - Num != 0)
+            int compare_bit = DOUBLE_COMP (SquareNear, Num);
+
+            if (compare_bit > 0)
             {
-                if (SquareNear - Num > 0)
-                {
-                    fprintf (To, "the difference between ");
-                }
-                else
-                {
-                    fprintf (To, "the sum of ");
-                }
+                fprintf (To, "the difference between ");
+            }
+            if (compare_bit < 0)
+            {
+                fprintf (To, "the sum of ");
             }
 
             fprintf (To, "the square of ");
             PushNumber (To, sqrt (Mod (SquareNear)), ShData);
 
-            if (SquareNear - Num != 0)
+            if (compare_bit != 0)
             {
                 fprintf (To, " and ");
                 PushNumber (To, Mod (SquareNear - Num), ShData);
@@ -627,22 +630,21 @@ void PushNumber (FILE* To, double Num, newTreeToShekspearData& ShData)
         }
         if (Mod (CubeNear - Num) <= Mod (SquareNear - Num) && Mod (CubeNear - Num) < Mod (PowTwoNear - Num))
         {
-            if (CubeNear - Num != 0)
+            int compare_bit = DOUBLE_COMP (CubeNear, Num);
+
+            if (compare_bit > 0)
             {
-                if (CubeNear - Num > 0)
-                {
-                    fprintf (To, "the difference between ");
-                }
-                else
-                {
-                    fprintf (To, "the sum of ");
-                }
+                fprintf (To, "the difference between ");
+            }
+            if (compare_bit < 0)
+            {
+                fprintf (To, "the sum of ");
             }
 
             fprintf (To, "the cube of ");
             PushNumber (To, cbrt (CubeNear), ShData);
 
-            if (CubeNear - Num != 0)
+            if (compare_bit != 0)
             {
                 fprintf (To, " and ");
                 PushNumber (To, Mod (CubeNear - Num), ShData);
@@ -652,40 +654,39 @@ void PushNumber (FILE* To, double Num, newTreeToShekspearData& ShData)
         }
         if (Mod (PowTwoNear - Num) <= Mod (SquareNear - Num) && Mod (PowTwoNear - Num) <= Mod (CubeNear - Num))
         {
-            if (PowTwoNear - Num != 0)
+            int compare_bit = DOUBLE_COMP (PowTwoNear, Num);
+
+            if (compare_bit > 0)
             {
-                if (PowTwoNear - Num > 0)
-                {
-                    fprintf (To, "the difference between ");
-                }
-                else
-                {
-                    fprintf (To, "the sum of ");
-                }
+                fprintf (To, "the difference between ");
+            }
+            if (compare_bit < 0)
+            {
+                fprintf (To, "the sum of ");
             }
 
             int Deg = (int)log2 (Mod (PowTwoNear));
 
             for (int i = 0; i < Deg; i ++)
             {
-                if (Ver (50))      AddRandListItem ("positive_adjective", To, ShData.Way);
-                else if (Ver (25)) AddRandListItem ("neutral_adjective", To, ShData.Way);
-                else               AddRandListItem ("negative_adjective", To, ShData.Way);
+                if (rand_state (3) == 1) AddRandListItem ("positive_adjective", To, ShData.Way);
+                if (rand_state (3) == 2) AddRandListItem ("neutral_adjective", To, ShData.Way);
+                if (rand_state (3) == 3) AddRandListItem ("negative_adjective", To, ShData.Way);
 
                 fprintf (To, " ");
             }
 
             if (Num > 0)
             {
-                if (Ver (50)) AddRandListItem ("positive_noun", To, ShData.Way);
-                else          AddRandListItem ("neutral_noun", To, ShData.Way);
+                if (rand_state (2) == 1) AddRandListItem ("positive_noun", To, ShData.Way);
+                if (rand_state (2) == 2) AddRandListItem ("neutral_noun", To, ShData.Way);
             }
             else
             {
                 AddRandListItem ("negative_noun", To, ShData.Way);
             }
 
-            if (PowTwoNear - Num != 0)
+            if (compare_bit != 0)
             {
                 fprintf (To, " and ");
                 PushNumber (To, Mod (PowTwoNear - Num), ShData);
@@ -696,18 +697,47 @@ void PushNumber (FILE* To, double Num, newTreeToShekspearData& ShData)
     }
 }
 
-void SetA (FILE* To, newTreeToShekspearData& ShData, int A)
+void SetA (FILE* To, newTreeToShekspearData& ShData, int A, int SelfModyfier)
 {
     CreateListener (To, A, ShData);
 
     fprintf (To, "    You ");
-    if (Ver (50))
+    if (coin_toss ())
     {
         fprintf (To, "are as ");
-        if (Ver (50))      AddRandListItem ("positive_adjective", To, ShData.Way);
-        else if (Ver (25)) AddRandListItem ("neutral_adjective", To, ShData.Way);
-        else               AddRandListItem ("negative_adjective", To, ShData.Way);
+        if (rand_state (3) == 1) AddRandListItem ("positive_adjective", To, ShData.Way);
+        if (rand_state (3) == 2) AddRandListItem ("neutral_adjective", To, ShData.Way);
+        if (rand_state (3) == 3) AddRandListItem ("negative_adjective", To, ShData.Way);
         fprintf (To, " as ");
+    }
+
+    if (SelfModyfier >= N_SUM_EQ && SelfModyfier <= N_MOD_EQ)
+    {
+        if (SelfModyfier == N_SUM_EQ)
+        {
+            fprintf (To, "the sum of ");
+        }
+        if (SelfModyfier == N_SUB_EQ)
+        {
+            fprintf (To, "the difference between ");
+        }
+        if (SelfModyfier == N_MUL_EQ)
+        {
+            fprintf (To, "the product of ");
+        }
+        if (SelfModyfier == N_DIV_EQ)
+        {
+            fprintf (To, "the quotient between ");
+        }
+        if (SelfModyfier == N_MOD_EQ)
+        {
+            fprintf (To, "the remainder of quotient between ");
+        }
+
+        if (rand_state (2) == 1) AddRandListItem ("second_person", To, ShData.Way);
+        if (rand_state (2) == 2) AddRandListItem ("second_person_reflexive", To, ShData.Way);
+
+        fprintf (To, " and ");
     }
 }
 
@@ -766,7 +796,7 @@ bool LinearInstance (newTree& Tree)
     return Return;
 }
 
-void SetVar (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& NodeInfo, newTreeToShekspearData& ShData, int A, int PIA)
+void SetVar (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& NodeInfo, newTreeToShekspearData& ShData, int A, int PIA, int SelfModyfier)
 {
     //printf ("SetVar\n");
 
@@ -823,8 +853,8 @@ void SetVar (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>
         Tree.Up ();
 
         fprintf (To, "    If not, ");
-        if (Ver(50)) fprintf (To, "we shall ");
-        else         fprintf (To, "let us ");
+        if (rand_state (2) == 1) fprintf (To, "we shall ");
+        if (rand_state (2) == 2) fprintf (To, "let us ");
         AddGotoScene (To, ShData.Scene + 1, ShData);
         fprintf (To, ".\n");
 
@@ -835,16 +865,16 @@ void SetVar (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>
         CreateListener (To, A, ShData);
 
         fprintf (To, "    If so, you ");
-        if (Ver (50))
+        if (coin_toss ())
         {
             fprintf (To, "are as ");
-            if (Ver (50))      AddRandListItem ("positive_adjective", To, ShData.Way);
-            else if (Ver (25)) AddRandListItem ("neutral_adjective", To, ShData.Way);
-            else               AddRandListItem ("negative_adjective", To, ShData.Way);
+            if (rand_state (3) == 1) AddRandListItem ("positive_adjective", To, ShData.Way);
+            if (rand_state (3) == 2) AddRandListItem ("neutral_adjective", To, ShData.Way);
+            if (rand_state (3) == 3) AddRandListItem ("negative_adjective", To, ShData.Way);
             fprintf (To, " as ");
         }
-        if (Ver (50)) AddRandListItem ("positive_noun", To, ShData.Way);
-        else          AddRandListItem ("neutral_noun", To, ShData.Way);
+        if (rand_state (2) == 1) AddRandListItem ("positive_noun", To, ShData.Way);
+        if (rand_state (2) == 2) AddRandListItem ("neutral_noun", To, ShData.Way);
         fprintf (To, ".\n");
 
         AddScene (To, ShData);
@@ -852,12 +882,12 @@ void SetVar (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>
         CreateListener (To, A, ShData);
 
         fprintf (To, "    If not, you ");
-        if (Ver (50))
+        if (coin_toss ())
         {
             fprintf (To, "are as ");
-            if (Ver (50))      AddRandListItem ("positive_adjective", To, ShData.Way);
-            else if (Ver (25)) AddRandListItem ("neutral_adjective", To, ShData.Way);
-            else               AddRandListItem ("negative_adjective", To, ShData.Way);
+            if (rand_state (3) == 1) AddRandListItem ("positive_adjective", To, ShData.Way);
+            if (rand_state (3) == 2) AddRandListItem ("neutral_adjective", To, ShData.Way);
+            if (rand_state (3) == 3) AddRandListItem ("negative_adjective", To, ShData.Way);
             fprintf (To, " as ");
         }
         AddRandListItem ("nothing", To, ShData.Way);
@@ -872,8 +902,8 @@ void SetVar (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>
         Tree.Up ();
 
         fprintf (To, "    If so, ");
-        if (Ver(50)) fprintf (To, "we shall ");
-        else         fprintf (To, "let us ");
+        if (rand_state (2) == 1) fprintf (To, "we shall ");
+        if (rand_state (2) == 2) fprintf (To, "let us ");
         AddGotoScene (To, ShData.Scene + 1, ShData);
         fprintf (To, ".\n");
 
@@ -884,12 +914,12 @@ void SetVar (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>
         CreateListener (To, A, ShData);
 
         fprintf (To, "    If not, you ");
-        if (Ver (50))
+        if (coin_toss ())
         {
             fprintf (To, "are as ");
-            if (Ver (50))      AddRandListItem ("positive_adjective", To, ShData.Way);
-            else if (Ver (25)) AddRandListItem ("neutral_adjective", To, ShData.Way);
-            else               AddRandListItem ("negative_adjective", To, ShData.Way);
+            if (rand_state (3) == 1) AddRandListItem ("positive_adjective", To, ShData.Way);
+            if (rand_state (3) == 2) AddRandListItem ("neutral_adjective", To, ShData.Way);
+            if (rand_state (3) == 3) AddRandListItem ("negative_adjective", To, ShData.Way);
             fprintf (To, " as ");
         }
         AddRandListItem ("nothing", To, ShData.Way);
@@ -900,16 +930,16 @@ void SetVar (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>
         CreateListener (To, A, ShData);
 
         fprintf (To, "    If so, you ");
-        if (Ver (50))
+        if (coin_toss ())
         {
             fprintf (To, "are as ");
-            if (Ver (50))      AddRandListItem ("positive_adjective", To, ShData.Way);
-            else if (Ver (25)) AddRandListItem ("neutral_adjective", To, ShData.Way);
-            else               AddRandListItem ("negative_adjective", To, ShData.Way);
+            if (rand_state (3) == 1) AddRandListItem ("positive_adjective", To, ShData.Way);
+            if (rand_state (3) == 2) AddRandListItem ("neutral_adjective", To, ShData.Way);
+            if (rand_state (3) == 3) AddRandListItem ("negative_adjective", To, ShData.Way);
             fprintf (To, " as ");
         }
-        if (Ver (50)) AddRandListItem ("positive_noun", To, ShData.Way);
-        else          AddRandListItem ("neutral_noun", To, ShData.Way);
+        if (rand_state (2) == 1) AddRandListItem ("positive_noun", To, ShData.Way);
+        if (rand_state (2) == 2) AddRandListItem ("neutral_noun", To, ShData.Way);
         fprintf (To, ".\n");
 
         return ;
@@ -926,8 +956,8 @@ void SetVar (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>
 
         if (!LinearInstance (Tree)) SetA (To, ShData, A);
         fprintf (To, "the remainder of quotient between the sum of ");
-        if (Ver (50)) AddRandListItem ("positive_noun", To, ShData.Way);
-        else          AddRandListItem ("neutral_noun", To, ShData.Way);
+        if (rand_state (2) == 1) AddRandListItem ("positive_noun", To, ShData.Way);
+        if (rand_state (2) == 2) AddRandListItem ("neutral_noun", To, ShData.Way);
         fprintf (To, " and ");
         if (LinearInstance (Tree)) SetVar (To, Tree, Info, NodeInfo, ShData);
         else                       PUSH_CHARACTER (A);
@@ -968,9 +998,9 @@ void SetVar (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>
 
         if (Data.Descriptor == N_NONEQ) fprintf (To, " not");
         fprintf (To, " as ");
-        if (Ver (50))      AddRandListItem ("positive_adjective", To, ShData.Way);
-        else if (Ver (25)) AddRandListItem ("neutral_adjective", To, ShData.Way);
-        else               AddRandListItem ("negative_adjective", To, ShData.Way);
+        if (rand_state (3) == 1) AddRandListItem ("positive_adjective", To, ShData.Way);
+        if (rand_state (3) == 2) AddRandListItem ("neutral_adjective", To, ShData.Way);
+        if (rand_state (3) == 3) AddRandListItem ("negative_adjective", To, ShData.Way);
         fprintf (To, " as ");
 
         Tree.DownR ();
@@ -985,16 +1015,16 @@ void SetVar (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>
         fprintf (To, ".\n");
 
         fprintf (To, "    If so, you ");
-        if (Ver (50))
+        if (coin_toss ())
         {
             fprintf (To, "are as ");
-            if (Ver (50))      AddRandListItem ("positive_adjective", To, ShData.Way);
-            else if (Ver (25)) AddRandListItem ("neutral_adjective", To, ShData.Way);
-            else               AddRandListItem ("negative_adjective", To, ShData.Way);
+            if (rand_state (3) == 1) AddRandListItem ("positive_adjective", To, ShData.Way);
+            if (rand_state (3) == 2) AddRandListItem ("neutral_adjective", To, ShData.Way);
+            if (rand_state (3) == 3) AddRandListItem ("negative_adjective", To, ShData.Way);
             fprintf (To, " as ");
         }
-        if (Ver (50)) AddRandListItem ("positive_noun", To, ShData.Way);
-        else          AddRandListItem ("neutral_noun", To, ShData.Way);
+        if (rand_state (2) == 1) AddRandListItem ("positive_noun", To, ShData.Way);
+        if (rand_state (2) == 2) AddRandListItem ("neutral_noun", To, ShData.Way);
         fprintf (To, ".\n");
 
         return ;
@@ -1044,16 +1074,16 @@ void SetVar (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>
         fprintf (To, ".\n");
 
         fprintf (To, "    If so, you ");
-        if (Ver (50))
+        if (coin_toss ())
         {
             fprintf (To, "are as ");
-            if (Ver (50))      AddRandListItem ("positive_adjective", To, ShData.Way);
-            else if (Ver (25)) AddRandListItem ("neutral_adjective", To, ShData.Way);
-            else               AddRandListItem ("negative_adjective", To, ShData.Way);
+            if (rand_state (3) == 1) AddRandListItem ("positive_adjective", To, ShData.Way);
+            if (rand_state (3) == 2) AddRandListItem ("neutral_adjective", To, ShData.Way);
+            if (rand_state (3) == 3) AddRandListItem ("negative_adjective", To, ShData.Way);
             fprintf (To, " as ");
         }
-        if (Ver (50)) AddRandListItem ("positive_noun", To, ShData.Way);
-        else          AddRandListItem ("neutral_noun", To, ShData.Way);
+        if (rand_state (2) == 1) AddRandListItem ("positive_noun", To, ShData.Way);
+        if (rand_state (2) == 2) AddRandListItem ("neutral_noun", To, ShData.Way);
         fprintf (To, ".\n");
 
         return ;
@@ -1062,7 +1092,7 @@ void SetVar (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>
     if (Data.Descriptor == N_VAR)
     {
         #ifdef IN_PROGRAM_DEBUG
-        fprintf (To, "/*Var %s{*/", Data.Name);
+        fprintf (To, "/*Var %s{*/", Data.GetName ());
         #endif
 
         PUSH_CHARACTER( PUSH_VAR(NodeInfo[Tree.CurrentNode ()].Addr) );
@@ -1185,7 +1215,7 @@ void SetVar (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>
     if (!LL)
     {
         Tree.DownL ();
-        SetVar (To, Tree, Info, NodeInfo, ShData, A, PIA);
+        SetVar (To, Tree, Info, NodeInfo, ShData, A, PIA, SelfModyfier);
         Tree.Up ();
     }
     if (!RL)
@@ -1193,7 +1223,7 @@ void SetVar (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>
         SaveA (To, ShData, A);
 
         Tree.DownR ();
-        SetVar (To, Tree, Info, NodeInfo, ShData, PIA, A);
+        SetVar (To, Tree, Info, NodeInfo, ShData, PIA, A, SelfModyfier);
         Tree.Up ();
 
         LoadA (To, ShData, A);
@@ -1201,7 +1231,7 @@ void SetVar (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>
 
     if (!LL || !RL)
     {
-        SetA (To, ShData, A);
+        SetA (To, ShData, A, SelfModyfier);
     }
 
     if (Data.Descriptor == N_SUM)
@@ -1572,6 +1602,8 @@ void Equal (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>&
 {
     //printf ("Equal\n");
 
+    int Desc = Tree.Get ().Descriptor;
+
     Tree.DownL ();
 
     if (Tree.Get ().Descriptor == N_VAR)
@@ -1579,21 +1611,34 @@ void Equal (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>&
         int Addr = PUSH_VAR(NodeInfo[Tree.CurrentNode ()].Addr);
         Tree.Up ();
 
-        Tree.DownR ();
-        if (LinearInstance (Tree))
+        if (Desc != N_INCR && Desc != N_DECR)
         {
-            SetA (To, ShData, Addr);
+            Tree.DownR ();
+            if (LinearInstance (Tree))
+            {
+                SetA (To, ShData, Addr, Desc);
 
-            SetVar (To, Tree, Info, NodeInfo, ShData);
+                SetVar (To, Tree, Info, NodeInfo, ShData);
 
-            fprintf (To, ".\n");
+                fprintf (To, ".\n");
+            }
+            else
+            {
+                SetVar (To, Tree, Info, NodeInfo, ShData, Addr, IA, Desc);
+            }
+            Tree.Up ();
         }
         else
         {
-            SetVar (To, Tree, Info, NodeInfo, ShData, Addr);
-        }
+            if (Desc == N_INCR) Desc = N_SUM_EQ;
+            if (Desc == N_DECR) Desc = N_SUB_EQ;
 
-        Tree.Up ();
+            SetA (To, ShData, Addr, Desc);
+
+            PushNumber (To, 1, ShData);
+
+            fprintf (To, ".\n");
+        }
 
         return ;
     }
@@ -1735,13 +1780,13 @@ void PushEquation (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNod
     else                        SetVar (To, Tree, Info, NodeInfo, ShData);
 
     fprintf (To, " as ");
-    if (Ver (50))      AddRandListItem ("positive_adjective", To, ShData.Way);
-    else if (Ver (25)) AddRandListItem ("neutral_adjective", To, ShData.Way);
-    else               AddRandListItem ("negative_adjective", To, ShData.Way);
+    if (rand_state (3) == 1) AddRandListItem ("positive_adjective", To, ShData.Way);
+    if (rand_state (3) == 2) AddRandListItem ("neutral_adjective", To, ShData.Way);
+    if (rand_state (3) == 3) AddRandListItem ("negative_adjective", To, ShData.Way);
     fprintf (To, " as ");
 
-    if (Ver (50)) AddRandListItem ("positive_noun", To, ShData.Way);
-    else          AddRandListItem ("neutral_noun", To, ShData.Way);
+    if (rand_state (2) == 1) AddRandListItem ("positive_noun", To, ShData.Way);
+    if (rand_state (2) == 2) AddRandListItem ("neutral_noun", To, ShData.Way);
 
     fprintf (To, "?\n");
 }
@@ -1768,8 +1813,8 @@ void If (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& No
         CreatePlace (To, ShData);
 
         fprintf (To, "    If not, ");
-        if (Ver (50)) fprintf (To, "let us ");
-        else             fprintf (To, "we shall ");
+        if (rand_state (2) == 1) fprintf (To, "let us ");
+        if (rand_state (2) == 2) fprintf (To, "we shall ");
         AddGotoScene (To, ShData.Scene + GetMarkNumber (Tree) + 1, ShData);
         fprintf (To, ".\n");
         CreateShekspearRec (To, Tree, Info, NodeInfo, ShData);
@@ -1782,8 +1827,8 @@ void If (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& No
 
         CreatePlace (To, ShData);
 
-        if (Ver (50)) fprintf (To, "    Let us ");
-        else             fprintf (To, "    We shall ");
+        if (rand_state (2) == 1) fprintf (To, "    Let us ");
+        if (rand_state (2) == 2) fprintf (To, "    We shall ");
         AddGotoScene (To, ShData.Scene + GetMarkNumber (Tree) + 2, ShData);
         fprintf (To, ".\n");
 
@@ -1799,8 +1844,8 @@ void If (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& No
         CreatePlace (To, ShData);
 
         fprintf (To, "    If not, ");
-        if (Ver (50)) fprintf (To, "let us ");
-        else             fprintf (To, "we shall ");
+        if (rand_state (2) == 1) fprintf (To, "let us ");
+        if (rand_state (2) == 2) fprintf (To, "we shall ");
         AddGotoScene (To, ShData.Scene + GetMarkNumber (Tree) + 1, ShData);
         fprintf (To, ".\n");
 
@@ -1837,8 +1882,8 @@ void While (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>&
     CreatePlace (To, ShData);
 
     fprintf (To, "    If not, ");
-    if (Ver (50)) fprintf (To, "let us ");
-    else             fprintf (To, "we shall ");
+    if (rand_state (2) == 1) fprintf (To, "let us ");
+    if (rand_state (2) == 2) fprintf (To, "we shall ");
     AddGotoScene (To, ShData.CycleEnd, ShData);
     fprintf (To, ".\n");
 
@@ -1850,8 +1895,8 @@ void While (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>&
 
     CreatePlace (To, ShData);
 
-    if (Ver (50)) fprintf (To, "    Let us ");
-    else             fprintf (To, "    We shall ");
+    if (rand_state (2) == 1) fprintf (To, "    Let us ");
+    if (rand_state (2) == 2) fprintf (To, "    We shall ");
     AddGotoScene (To, ShData.CycleStart, ShData);
     fprintf (To, ".\n");
 
@@ -1880,8 +1925,8 @@ void For (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& N
 
     Tree.DownR ();
     Tree.DownL ();
-    if (Ver (50)) fprintf (To, "    Let us ");
-    else             fprintf (To, "    We shall ");
+    if (rand_state (2) == 1) fprintf (To, "    Let us ");
+    if (rand_state (2) == 2) fprintf (To, "    We shall ");
     AddGotoScene (To, ShData.Scene + GetMarkNumber (Tree) + 2, ShData);
     fprintf (To, ".\n");
     Tree.Up ();
@@ -1907,8 +1952,8 @@ void For (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& N
     CreatePlace (To, ShData);
 
     fprintf (To, "    If not, ");
-    if (Ver (50)) fprintf (To, "let us ");
-    else             fprintf (To, "we shall ");
+    if (rand_state (2) == 1) fprintf (To, "let us ");
+    if (rand_state (2) == 2) fprintf (To, "we shall ");
     AddGotoScene (To, ShData.CycleEnd, ShData);
     fprintf (To, ".\n");
 
@@ -1922,8 +1967,8 @@ void For (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& N
 
     CreatePlace (To, ShData);
 
-    if (Ver (50)) fprintf (To, "    Let us ");
-    else             fprintf (To, "    We shall ");
+    if (rand_state (2) == 1) fprintf (To, "    Let us ");
+    if (rand_state (2) == 2) fprintf (To, "    We shall ");
     AddGotoScene (To, ShData.CycleStart, ShData);
     fprintf (To, ".\n");
 
@@ -1954,7 +1999,7 @@ void NewFunc (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo
 
     Tree.CurrentNode (NodeInfo [Tree.CurrentNode ()].Addr);
 
-    if (strcmp (Tree.Get ().Name, "main") != 0)
+    if (strcmp (Tree.Get ().GetName (), "main") != 0)
     {
         CreatePlace (To, ShData);
 

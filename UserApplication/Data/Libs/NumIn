@@ -1,6 +1,6 @@
-new NumIn (new& Num)
+new NumIn ()
 {
-    Num = 0;
+    new Num = 0;
     new c = 0;
     get c;
     while (c != '\n')
@@ -8,4 +8,6 @@ new NumIn (new& Num)
         Num = Num * 10 + c - '0';
         get c;
     }
+ 
+    return Num;
 }

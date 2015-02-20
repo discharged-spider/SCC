@@ -16,7 +16,7 @@ GetBB Name || Name = GetAA || Name [GetAA] || Name [GetAA] = GetArr || &Name || 
 
 GetCA del Name || del Name[]
 
-GetCB GetAG = GetAA
+GetCB GetAG = GetAA || GetAG ++ || GetAG -- || GetAG += GetAA || GetAG -= GetAA || GetAG *= GetAA || GetAG /= GetAA || GetAG %= GetAA
 
 GetCC if (GetAA) GetC || if (GetAA) GetC else GetC
 

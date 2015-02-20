@@ -1,4 +1,4 @@
-case (0/*push*/):
+case (Syntax::PUSH):
 {
     i ++;
 
@@ -18,14 +18,14 @@ case (0/*push*/):
 
     break;
 }
-case (1/*pop*/):
+case (Syntax::POP):
 {
     ADD_8_ESP
     PUSH_BYTE (0x8)
 
     break;
 }
-case (2/*dup*/):
+case (Syntax::DUP):
 {
     POP_32_REG (EAX)
     POP_32_REG (EBX)
@@ -38,7 +38,7 @@ case (2/*dup*/):
 
     break;
 }
-case (3/*swap*/):
+case (Syntax::SWAP):
 {
     POP_32_REG (EAX)
     POP_32_REG (EBX)
@@ -54,7 +54,7 @@ case (3/*swap*/):
 
     break;
 }
-case (4/*down*/):
+case (Syntax::DOWN):
 {
     i ++;
 

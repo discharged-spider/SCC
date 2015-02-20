@@ -4,8 +4,10 @@
 #include "math.h"
 #include "..\Syntax\Syntax.h"
 #include "..\Compiler\Assem.h"
-#include "..\\..\\SystemFolder\\_SystemLibs\\Stack\\Stack.h"
-#include "..\\..\\SystemFolder\\_SystemLibs\\Throw\\Throw.h"
+#include "..\..\SystemFolder\_SystemLibs\Stack\Stack.h"
+#include "..\..\SystemFolder\_SystemLibs\Throw\Throw.h"
+
+#include "..\Syntax\VariablesInspector.h"
 
 //==============================================================================
 
@@ -18,8 +20,16 @@ class newProcessor
 
     newStack  <double> Stack_;
 
+    bool                  UseInspector_;
+    newVariablesInspector Inspector_;
+
     double* Program_;
     int     Size_;
+
+    FILE* input;
+    FILE* output;
+
+    newProcessor ();
 
     void SetProgram (double Program [], int Size);
     int  ExecuteProgram ();
@@ -29,6 +39,19 @@ class newProcessor
 
     void MemoryDump ();
 };
+
+//------------------------------------------------------------------------------
+
+newProcessor::newProcessor () :
+    MemorySize_ (),
+    FreeMemory_ (),
+    Memory_     (),
+
+    Stack_      (),
+
+    UseInspector_ (false),
+    Inspector_    ()
+{}
 
 //------------------------------------------------------------------------------
 
@@ -52,9 +75,9 @@ int newProcessor::ExecuteProgram ()
         CommandsN ++;
 
         #ifdef DEBUG
-            #define COMAND_DEF(NUM, NAME, DESCRIPTOR, PARAMS, CODE) if ((int)Program_ [i] == DESCRIPTOR) printf ("Comand to execut = %s\n", NAME);
-            #include "..\Syntax\ComandDef.h"
-            #undef COMAND_DEF
+            #define COMMAND_DEF(NUM, NAME, STR, DESCRIPTOR, PARAMS, CODE) if ((int)Program_ [i] == DESCRIPTOR) printf ("Comand to execut = %s (\"%s\")\n", #NAME, STR);
+            #include "..\Syntax\CommandDef.h"
+            #undef COMMAND_DEF
 
             Stack_.Dump();
             system ("pause");
@@ -62,7 +85,7 @@ int newProcessor::ExecuteProgram ()
 
         switch ((int)Program_ [i])
         {
-            #define COMAND_DEF(NUM, NAME, DESCRIPTOR, PARAMS, CODE) \
+            #define COMMAND_DEF(NUM, NAME, STR, DESCRIPTOR, PARAMS, CODE) \
             case (DESCRIPTOR): \
             { \
                 CODE; \
@@ -70,8 +93,8 @@ int newProcessor::ExecuteProgram ()
                 break; \
             }
 
-            #include "..\Syntax\ComandDef.h"
-            #undef COMAND_DEF
+            #include "..\Syntax\CommandDef.h"
+            #undef COMMAND_DEF
 
             default:
             {

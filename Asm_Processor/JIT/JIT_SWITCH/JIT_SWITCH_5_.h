@@ -1,4 +1,4 @@
-case (50/*@*/):
+case (Syntax::ECHO):
 {
     FLD_64_MEMORY_ESP
 
@@ -23,7 +23,7 @@ case (50/*@*/):
 
     break;
 }
-case (51/*&*/):
+case (Syntax::GET):
 {
     MOV_32_REG (EAX)
     ToLink.push ((*OutputSize - 1) + 1);
@@ -37,12 +37,17 @@ case (51/*&*/):
 
     CALL_32_ADDR_EAX
 
-    PUSH_32_REG (EBX) //To keep memory for FSTP_64_MEMORY_ESP
-    PUSH_32_REG (EBX)
+    /*
+    PUSH_32_REG (ECX) //To keep memory for FSTP_64_MEMORY_ESP
+    PUSH_32_REG (ECX)
 
     FILD_32_MEMORY_ESP
 
     FSTP_64_MEMORY_ESP
+    */
+
+    PUSH_32_REG (EDX)
+    PUSH_32_REG (ECX)
 
     break;
 }

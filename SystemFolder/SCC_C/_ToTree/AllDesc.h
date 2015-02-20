@@ -4,23 +4,29 @@
 #include "..\..\SCC_TREE\Lib\BaseTreeDesc.h"
 #include "Assem\AssemDesc.h"
 
+//==============================================================================
+
+void GetDesc (FILE* file, newNodeData Data);
+
+//==============================================================================
+
 void GetDesc (FILE* file, newNodeData Data)
 {
     if (Data.Descriptor == N_NUM)
     {
-        fprintf (file, "%lg", Data.Data);
+        fprintf (file, "%g", Data.Data);
     }
     if (Data.Descriptor == N_VAR)
     {
-        fprintf (file, "%s", Data.Name);
+        fprintf (file, "%s", Data.GetName ());
     }
     if (Data.Descriptor == N_ARR)
     {
-        fprintf (file, "%s", Data.Name);
+        fprintf (file, "%s", Data.GetName ());
     }
     if (Data.Descriptor == N_FUN)
     {
-        fprintf (file, "%s", Data.Name);
+        fprintf (file, "%s", Data.GetName ());
     }
 
     if (Data.Descriptor == N_NEW)
@@ -35,6 +41,34 @@ void GetDesc (FILE* file, newNodeData Data)
     if (Data.Descriptor == N_EQ)
     {
         fprintf (file, "=");
+    }
+    if (Data.Descriptor == N_INCR)
+    {
+        fprintf (file, "++");
+    }
+    if (Data.Descriptor == N_DECR)
+    {
+        fprintf (file, "--");
+    }
+    if (Data.Descriptor == N_SUM_EQ)
+    {
+        fprintf (file, "+=");
+    }
+    if (Data.Descriptor == N_SUB_EQ)
+    {
+        fprintf (file, "-=");
+    }
+    if (Data.Descriptor == N_MUL_EQ)
+    {
+        fprintf (file, "*=");
+    }
+    if (Data.Descriptor == N_DIV_EQ)
+    {
+        fprintf (file, "/=");
+    }
+    if (Data.Descriptor == N_MOD_EQ)
+    {
+        fprintf (file, "%%=");
     }
 
     if (Data.Descriptor == N_SUM)
@@ -182,14 +216,13 @@ void GetDesc (FILE* file, newNodeData Data)
 
     if (Data.Descriptor == N_NAME)
     {
-        fprintf (file, "%s(N_NAME)", Data.Name);
+        fprintf (file, "%s(N_NAME)", Data.GetName ());
     }
 
     if (Data.Descriptor == N_LIST)
     {
         fprintf (file, ",");
     }
-
 }
 
 #endif

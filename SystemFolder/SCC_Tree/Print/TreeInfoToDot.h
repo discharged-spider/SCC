@@ -65,7 +65,7 @@ void DrawTreeNode (FILE* To, newNode Node, newNodeInfo NodeInfo, int i)
                           .color     ("darkgreen")
                           .fillcolor ("#C4F6C1");
 
-            n -= _snprintf (Label + MaxSize - n, n, "\nVAR = \"%s\"[%d] &%d\n", Data.Name, NodeInfo.ID, NodeInfo.Addr);
+            n -= _snprintf (Label + MaxSize - n, n, "\nVAR = \"%s\"[%d] &%d\n", Data.GetName (), NodeInfo.ID, NodeInfo.Addr);
 
             break;
         }
@@ -75,7 +75,7 @@ void DrawTreeNode (FILE* To, newNode Node, newNodeInfo NodeInfo, int i)
                           .color     ("darkgreen")
                           .fillcolor ("#C4F6C1");
 
-            n -= _snprintf (Label + MaxSize - n, n, "\nARR = \"%s\"[%d] &%d\n", Data.Name, NodeInfo.ID, NodeInfo.Addr);
+            n -= _snprintf (Label + MaxSize - n, n, "\nARR = \"%s\"[%d] &%d\n", Data.GetName (), NodeInfo.ID, NodeInfo.Addr);
 
             break;
         }
@@ -85,7 +85,7 @@ void DrawTreeNode (FILE* To, newNode Node, newNodeInfo NodeInfo, int i)
                           .color     ("darkgreen")
                           .fillcolor ("#C4F6C1");
 
-            n -= _snprintf (Label + MaxSize - n, n, "\nFUNC = \"%s\"[%d]\n", Data.Name, NodeInfo.ID);
+            n -= _snprintf (Label + MaxSize - n, n, "\nFUNC = \"%s\"[%d]\n", Data.GetName (), NodeInfo.ID);
 
             break;
         }
@@ -95,7 +95,7 @@ void DrawTreeNode (FILE* To, newNode Node, newNodeInfo NodeInfo, int i)
                           .color     ("darkgreen")
                           .fillcolor ("#C4F6C1");
 
-            n -= _snprintf (Label + MaxSize - n, n, "\nLINK = \"%s\"[%d] &%d\n", Data.Name, NodeInfo.ID, NodeInfo.Addr);
+            n -= _snprintf (Label + MaxSize - n, n, "\nLINK = \"%s\"[%d] &%d\n", Data.GetName (), NodeInfo.ID, NodeInfo.Addr);
 
             break;
         }
@@ -138,6 +138,76 @@ void DrawTreeNode (FILE* To, newNode Node, newNodeInfo NodeInfo, int i)
                           .fillcolor ("#FFCCC9");
 
             n -= _snprintf (Label + MaxSize - n, n, "\n=\n");
+
+            break;
+        }
+        case (N_INCR):
+        {
+            dtNodeStyle ().fontcolor ("red")
+                          .color     ("red")
+                          .fillcolor ("#FFCCC9");
+
+            n -= _snprintf (Label + MaxSize - n, n, "\n++\n");
+
+            break;
+        }
+        case (N_DECR):
+        {
+            dtNodeStyle ().fontcolor ("red")
+                          .color     ("red")
+                          .fillcolor ("#FFCCC9");
+
+            n -= _snprintf (Label + MaxSize - n, n, "\n--\n");
+
+            break;
+        }
+        case (N_SUM_EQ):
+        {
+            dtNodeStyle ().fontcolor ("red")
+                          .color     ("red")
+                          .fillcolor ("#FFCCC9");
+
+            n -= _snprintf (Label + MaxSize - n, n, "\n+=\n");
+
+            break;
+        }
+        case (N_SUB_EQ):
+        {
+            dtNodeStyle ().fontcolor ("red")
+                          .color     ("red")
+                          .fillcolor ("#FFCCC9");
+
+            n -= _snprintf (Label + MaxSize - n, n, "\n-=\n");
+
+            break;
+        }
+        case (N_MUL_EQ):
+        {
+            dtNodeStyle ().fontcolor ("red")
+                          .color     ("red")
+                          .fillcolor ("#FFCCC9");
+
+            n -= _snprintf (Label + MaxSize - n, n, "\n*=\n");
+
+            break;
+        }
+        case (N_DIV_EQ):
+        {
+            dtNodeStyle ().fontcolor ("red")
+                          .color     ("red")
+                          .fillcolor ("#FFCCC9");
+
+            n -= _snprintf (Label + MaxSize - n, n, "\n/=\n");
+
+            break;
+        }
+        case (N_MOD_EQ):
+        {
+            dtNodeStyle ().fontcolor ("red")
+                          .color     ("red")
+                          .fillcolor ("#FFCCC9");
+
+            n -= _snprintf (Label + MaxSize - n, n, "\n%=\n");
 
             break;
         }
@@ -397,7 +467,7 @@ void DrawTreeNode (FILE* To, newNode Node, newNodeInfo NodeInfo, int i)
                           .color     ("darkslateblue")
                           .fillcolor ("#CCEDFF");
 
-            n -= _snprintf (Label + MaxSize - n, n, "\nMARK \"%s\"[%d]\n", Data.Name, NodeInfo.ID);
+            n -= _snprintf (Label + MaxSize - n, n, "\nMARK \"%s\"[%d]\n", Data.GetName (), NodeInfo.ID);
 
             break;
         }
@@ -407,7 +477,7 @@ void DrawTreeNode (FILE* To, newNode Node, newNodeInfo NodeInfo, int i)
                           .color     ("darkslateblue")
                           .fillcolor ("#CCEDFF");
 
-            n -= _snprintf (Label + MaxSize - n, n, "\nGOTO \"%s\"[%d]\n", Data.Name, NodeInfo.ID);
+            n -= _snprintf (Label + MaxSize - n, n, "\nGOTO \"%s\"[%d]\n", Data.GetName (), NodeInfo.ID);
 
             break;
         }

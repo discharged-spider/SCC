@@ -7,30 +7,37 @@ class newCounter
 {
     private:
     int Size_;
-    newStack  < int >              D_;
-    newVector < bool >             Mask_;
-    newVector < newVector <char> > Data_;
+    newStack  < int >    D_;
+    newVector < bool >   Mask_;
+    newVector < string > Data_;
 
     public:
     newCounter ();
+    ~newCounter ();
 
     int Size ();
 
     int UsedSize ();
 
-    int Find (char Value []);
+    int Find (char* Value);
 
     void Rem (int i);
-    int  Add (char Value []);
+    int  Add (char* Value);
 
-    int LevelRem (char Value []);
+    int LevelRem (char* Value);
 
     void PushMemory ();
     void PopMemory ();
 };
 
 newCounter::newCounter () :
-    Size_ (0)
+    Size_ (0),
+    D_ (),
+    Mask_ (),
+    Data_ ()
+{}
+
+newCounter::~newCounter ()
 {}
 
 int newCounter::Size ()
@@ -49,11 +56,11 @@ int newCounter::UsedSize ()
     return Result;
 }
 
-int  newCounter::Find (char Value [])
+int  newCounter::Find (char* Value)
 {
     for (int i = 0; i < Size_; i ++)
     {
-       if (Mask_ [i] == true && strcmp (Value, &(Data_[i])[0]) == 0) return i;
+       if (Mask_ [i] == true && Data_[i] == Value) return i;
     }
 
     return -1;
@@ -68,7 +75,7 @@ void newCounter::Rem (int i)
     if (i == Size_ - 1) Size_ --;
 }
 
-int newCounter::LevelRem (char Value [])
+int newCounter::LevelRem (char* Value)
 {
     newStack <int> D = D_;
 
@@ -85,7 +92,7 @@ int newCounter::LevelRem (char Value [])
         }
         if (i == -2) continue;
 
-        if (strcmp (&(Data_ [i])[0], Value) == 0)
+        if (Data_ [i] == Value)
         {
             return Level;
         }
@@ -94,7 +101,7 @@ int newCounter::LevelRem (char Value [])
     return -1;
 }
 
-int newCounter::Add (char Value [])
+int newCounter::Add (char* Value)
 {
     for (int i = 0; i < Size_; i ++)
     {
@@ -102,11 +109,7 @@ int newCounter::Add (char Value [])
         {
             Mask_ [i] = true;
 
-            for (int c = 0; Value [c] != 0; c ++)
-            {
-                (Data_ [i])[c] = Value [c];
-                (Data_ [i])[c + 1] = 0;
-            }
+            Data_ [i] = Value;
 
             D_.Push (i);
 
@@ -116,11 +119,7 @@ int newCounter::Add (char Value [])
 
     Mask_ [Size_] = true;
 
-    for (int c = 0; Value [c] != 0; c ++)
-    {
-        (Data_ [Size_])[c] = Value [c];
-        (Data_ [Size_])[c + 1] = 0;
-    }
+    Data_ [Size_] = Value;
 
     Size_ ++;
 

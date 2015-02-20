@@ -4,13 +4,16 @@
 #include "cstdio"
 #include "cstdlib"
 #include "cstring"
+#include "algorithm"
 #include "string"
 
-bool ReadWord (FILE* file, char Word [], string way);
+bool ReadWord (FILE* file, string& Word, string way);
 
-bool ReadShekspearWord (FILE* file, char Word [], string Way);
+bool ReadShekspearWord (FILE* file, string& Word, string Way);
 
-bool InList (const char ListName [], char Word [], string Way);
+bool InList (string& Word, string Way);
+
+bool InList (const char ListName [], string& Word, string Way);
 
 void ReadTo (FILE* file, const char Str []);
 
@@ -18,72 +21,96 @@ void ReadSentense (FILE* file, string Way);
 
 //------------------------------------------------------------------------------
 
-bool ReadWord (FILE* file, char Word [], string Way)
+bool ReadWord (FILE* file, string& Word, string Way)
 {
+    Word.clear ();
+
     bool Start = false;
     char c     = 0;
-    if (fread (&c, sizeof (c), 1, file) != 1) return false;
-    if (isupper(c)) c = tolower (c);
+    if (fread (&c, sizeof (c), 1, file) != 1) return 0;
 
-    int i = 0;
-    for (; ; i ++)
+    bool seek = false;
+
+    while (true)
     {
         if (c == '.' || c == '!' || c == '?' || c == ',' || c == '[' || c == ']' || c == ':')
         {
-            if (i == 0)
+            if (Word.size () == 0)
             {
-                Word [i] = c;
-
-                i ++;
-
-                Word [i] = 0;
+                Word.push_back (c);
             }
             else
             {
-                fseek (file, -1, SEEK_CUR);
-
-                Word [i] = 0;
+                seek = true;
             }
 
             break;
         }
 
-        if (c == ' ' || c == '\n' || c == '\r' || c == '\0')
+        if (c == ' ' || c == '\n' || c == '\r' || c == '\0' || c == '\t')
         {
-           if (Start)
-           {
-               Word [i] = 0;
+            if (Start)
+            {
+                seek = true;
 
-               if (i == 0) return false;
-
-               break;
-           }
-           else i --;
+                break;
+            }
         }
         else
         {
-            if (!Start) Start = true;
-            Word [i] = c;
+            Start = true;
+
+            Word.push_back (c);
         }
 
-        if (fread (&c, sizeof (c), 1, file) != 1)
-        {
-            i ++;
-            Word [i] = 0;
-            break;
-        }
-        if (isupper(c)) c = tolower (c);
+        if (!fread (&c, sizeof (c), 1, file)) break;
     }
 
-    if (i > 0 && InList ("skip", Word, Way)) return ReadWord (file, Word, Way);
+    if (seek) fseek (file, -1, SEEK_CUR);
 
-    return i > 0;
+    if (Word.size () > 0 && InList ("skip", Word, Way)) return ReadWord (file, Word, Way);
+
+    std::transform (Word.begin(), Word.end(), Word.begin(), ::tolower);
+
+    return Word.size () > 0;
 }
 
-bool ReadShekspearWord (FILE* file, char Word [], string Way)
+bool ReadShekspearWord (FILE* file, string& Word, string Way)
 {
-    if (!ReadWord (file, Word, Way)) return false;
+    string Simple_word;
 
+    if (!ReadWord (file, Simple_word, Way)) return false;
+
+    string Complex_word = Simple_word;
+
+    int Pos = ftell (file);
+
+    if (ReadWord (file, Word, Way))
+    {
+        Complex_word += " ";
+        Complex_word += Word;
+
+        if (InList (Complex_word, Way))
+        {
+            #ifdef DEBUG
+                printf ("Word %s - not simple shekspear word\n", Word);
+            #endif
+
+            Word = Complex_word;
+
+            return true;
+        }
+
+        fseek (file, Pos, SEEK_SET);
+    }
+
+    Word = Simple_word;
+
+    return InList (Word, Way);
+}
+
+bool InList (string& Word, string Way)
+{
     if (InList ("system", Word, Way)) return true;
 
     if (InList ("be", Word, Way)) return true;
@@ -107,46 +134,10 @@ bool ReadShekspearWord (FILE* file, char Word [], string Way)
     if (InList ("sentence_end", Word, Way)) return true;
     if (InList ("third_person_possessive", Word, Way)) return true;
 
-    #ifdef DEBUG
-        printf ("Word %s - not simple shekspear word\n", Word);
-    #endif
-
-    int Pos = ftell (file);
-
-    string WholeWord = Word;
-    if (!ReadWord (file, Word, Way)) return false;
-    WholeWord += " ";
-    WholeWord += Word;
-
-    strcpy (Word, WholeWord.c_str());
-
-    if (InList ("be", Word, Way)) return true;
-    if (InList ("character", Word, Way)) return true;
-    if (InList ("first_person", Word, Way)) return true;
-    if (InList ("first_person_possessive", Word, Way)) return true;
-    if (InList ("first_person_reflexive", Word, Way)) return true;
-    if (InList ("negative_adjective", Word, Way)) return true;
-    if (InList ("negative_comparative", Word, Way)) return true;
-    if (InList ("negative_noun", Word, Way)) return true;
-    if (InList ("neutral_adjective", Word, Way)) return true;
-    if (InList ("neutral_noun", Word, Way)) return true;
-    if (InList ("nothing", Word, Way)) return true;
-    if (InList ("places", Word, Way)) return true;
-    if (InList ("positive_adjective", Word, Way)) return true;
-    if (InList ("positive_comparative", Word, Way)) return true;
-    if (InList ("positive_noun", Word, Way)) return true;
-    if (InList ("second_person", Word, Way)) return true;
-    if (InList ("second_person_possessive", Word, Way)) return true;
-    if (InList ("second_person_reflexive", Word, Way)) return true;
-    if (InList ("sentence_end", Word, Way)) return true;
-    if (InList ("third_person_possessive", Word, Way)) return true;
-
-    fseek (file, Pos, 0);
-
     return false;
 }
 
-bool InList (const char ListName [], char Word [], string Way)
+bool InList (const char ListName [], string& Word, string Way)
 {
     Way += "..\\Lists\\";
     Way += ListName;
@@ -233,7 +224,7 @@ void ReadTo (FILE* file, const char Str [])
 
 void ReadSentense (FILE* file, string Way)
 {
-    char c[2] = "A";
+    string c = "A";
     while (fread (&c[0], sizeof (c[0]), 1, file) == 1)
     {
         if (c[0] == '\n' || c[0] == '\r' || c[0] == ' ') continue;

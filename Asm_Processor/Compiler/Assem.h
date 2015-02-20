@@ -11,7 +11,7 @@
 
 using namespace std;
 
-#define __Size 30
+#define MAX_WORD_SIZE 30
 
 //==============================================================================
 
@@ -62,7 +62,7 @@ bool ReadWord (FILE* file, char Word [])
     int i = 0;
     for (; ; i ++)
     {
-        if (i >= __Size) return false;
+        if (i >= MAX_WORD_SIZE) return false;
 
         if (Exept (c))
         {
@@ -97,17 +97,17 @@ bool ReadWord (FILE* file, char Word [])
 
 int GetWordDescNum (const char Word [])
 {
-    #define COMAND_DEF(NUM, NAME, DESCRIPTOR, PARAMS, CODE) if (strcmp (NAME, Word) == 0) return NUM;
-    #include "..\Syntax\ComandDef.h"
-    #undef COMAND_DEF
+    #define COMMAND_DEF(NUM, NAME, STR, DESCRIPTOR, PARAMS, CODE) if (strcmp (STR, Word) == 0) return NUM;
+    #include "..\Syntax\CommandDef.h"
+    #undef COMMAND_DEF
 
     return -1;
 }
 int GetDescWordNum (const int  Desc)
 {
-    #define COMAND_DEF(NUM, NAME, DESCRIPTOR, PARAMS, CODE) if (DESCRIPTOR == Desc) return NUM;
-    #include "..\Syntax\ComandDef.h"
-    #undef COMAND_DEF
+    #define COMMAND_DEF(NUM, NAME, STR, DESCRIPTOR, PARAMS, CODE) if (DESCRIPTOR == Desc) return NUM;
+    #include "..\Syntax\CommandDef.h"
+    #undef COMMAND_DEF
 
     return -1;
 }
@@ -120,7 +120,7 @@ bool ReadProgram (FILE* From, vector<double>& To, int* Size, FILE* ErrorOutput)
     {
         *Size = 0;
 
-        char Word [__Size] = "";
+        char Word [MAX_WORD_SIZE] = "";
         int WordNum = 0;
         while (true)
         {
@@ -129,15 +129,15 @@ bool ReadProgram (FILE* From, vector<double>& To, int* Size, FILE* ErrorOutput)
             WordNum = GetWordDescNum (Word);
             if (WordNum == -1) throw TH_ERROR "Unknown comand |%s|", Word);
 
-            To.push_back(Syntax::Comands[WordNum].Descriptor);
+            To.push_back(Syntax::Commands[WordNum].Descriptor);
             *Size += 1;
 
-            if (Syntax::Comands[WordNum].Params > 0)
+            if (Syntax::Commands[WordNum].Params > 0)
             {
-                for (int i = 0; i < Syntax::Comands[WordNum].Params; i ++)
+                for (int i = 0; i < Syntax::Commands[WordNum].Params; i ++)
                 {
                     double n = 0;
-                    if (!ReadWord (From, Word)) throw TH_ERROR "No number after %s!", Syntax::Comands[WordNum].Name);
+                    if (!ReadWord (From, Word)) throw TH_ERROR "No number after %s!", Syntax::Commands[WordNum].Name);
 
                     if (!sscanf (Word, "%lg", &n)) throw TH_ERROR "%s - not a number!", Word);
 
@@ -182,7 +182,7 @@ bool Assemble (vector<double> From, int FromSize, vector<double>& Program, int* 
 
         for (int i = 0; i < FromSize; i ++)
         {
-            if (From [i] == 20)
+            if (From [i] == Syntax::MARK)
             {
                 i ++;
 
@@ -199,15 +199,15 @@ bool Assemble (vector<double> From, int FromSize, vector<double>& Program, int* 
                 continue;
             }
 
-            #define COMAND_DEF(NUM, NAME, DESCRIPTOR, PARAMS, CODE) if (DESCRIPTOR == From[i]) {i += PARAMS; continue; }
-            #include "..\Syntax\ComandDef.h"
-            #undef COMAND_DEF
+            #define COMMAND_DEF(NUM, NAME, STR, DESCRIPTOR, PARAMS, CODE)if (DESCRIPTOR == From[i]) {i += PARAMS; continue; }
+            #include "..\Syntax\CommandDef.h"
+            #undef COMMAND_DEF
         }
 
         *Size = 0;
         for (int i = 0; i < FromSize; i ++)
         {
-            if (From [i] == 20)
+            if (From [i] == Syntax::MARK)
             {
                 i ++;
 
@@ -239,9 +239,9 @@ bool Assemble (vector<double> From, int FromSize, vector<double>& Program, int* 
                 continue;
             }
 
-            #define COMAND_DEF(NUM, NAME, DESCRIPTOR, PARAMS, CODE) if (DESCRIPTOR == From[i]) {for (int j = 0; j < PARAMS; j ++) {i ++; Program.push_back (From [i]); *Size += 1; } continue; }
-            #include "..\Syntax\ComandDef.h"
-            #undef COMAND_DEF
+            #define COMMAND_DEF(NUM, NAME, STR, DESCRIPTOR, PARAMS, CODE) if (DESCRIPTOR == From[i]) {for (int j = 0; j < PARAMS; j ++) {i ++; Program.push_back (From [i]); *Size += 1; } continue; }
+            #include "..\Syntax\CommandDef.h"
+            #undef COMMAND_DEF
         }
     }
     catch (newThrowError& Error)
@@ -270,7 +270,7 @@ bool JITPrepare (vector<double>& Program, int* Size, FILE* ErrorOutput)
 
         for (int i = 0; i < *Size; i ++)
         {
-            if (Program [i] == 20)
+            if (Program [i] == Syntax::MARK)
             {
                 i ++;
 
@@ -288,9 +288,9 @@ bool JITPrepare (vector<double>& Program, int* Size, FILE* ErrorOutput)
                 continue;
             }
 
-            #define COMAND_DEF(NUM, NAME, DESCRIPTOR, PARAMS, CODE) if (DESCRIPTOR == Program[i]) {i += PARAMS; continue; }
-            #include "..\Syntax\ComandDef.h"
-            #undef COMAND_DEF
+            #define COMMAND_DEF(NUM, NAME, STR, DESCRIPTOR, PARAMS, CODE) if (DESCRIPTOR == Program[i]) {i += PARAMS; continue; }
+            #include "..\Syntax\CommandDef.h"
+            #undef COMMAND_DEF
         }
 
         for (int i = 0; i < *Size; i ++)
@@ -315,9 +315,9 @@ bool JITPrepare (vector<double>& Program, int* Size, FILE* ErrorOutput)
                 continue;
             }
 
-            #define COMAND_DEF(NUM, NAME, DESCRIPTOR, PARAMS, CODE) if (DESCRIPTOR == Program[i]) {i += PARAMS; continue; }
-            #include "..\Syntax\ComandDef.h"
-            #undef COMAND_DEF
+            #define COMMAND_DEF(NUM, NAME, STR, DESCRIPTOR, PARAMS, CODE) if (DESCRIPTOR == Program[i]) {i += PARAMS; continue; }
+            #include "..\Syntax\CommandDef.h"
+            #undef COMMAND_DEF
         }
     }
     catch (newThrowError& Error)

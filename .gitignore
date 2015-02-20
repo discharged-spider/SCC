@@ -1,0 +1,13 @@
+_
+*.[oa]
+*.exe
+*.chm
+
+*.scc_tree
+*.scc_tree_info
+*.jpg
+
+Error.txt
+Output.txt
+
+UserApplication

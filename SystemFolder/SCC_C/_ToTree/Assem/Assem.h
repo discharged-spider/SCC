@@ -8,7 +8,10 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "strings.h"
+#include "string"
 #include "..\..\..\_SystemLibs\Throw\Throw.h"
+
+using std::string;
 
 //==============================================================================
 
@@ -33,13 +36,13 @@ bool Operator (char Symbol);
 
 //==============================================================================
 
-bool ReadWord (FILE* file, char Word []);
+bool ReadWord (FILE* file, string& Word, int* line = 0, int* spaces = 0);
 
 //==============================================================================
 
-bool TryToKey (char Word [], newNodeData* Data);
+bool TryToKey (string& Word, newNodeData* Data);
 
-bool TryToNum (char Word [], newNodeData* Data);
+bool TryToNum (string& Word, newNodeData* Data);
 
 //==============================================================================
 
@@ -83,32 +86,41 @@ bool Operator (char Symbol)
 
 //==============================================================================
 
-bool ReadWord (FILE* file, char Word [])
+bool ReadWord (FILE* file, string& Word, int* line, int* spaces)
 {
+    Word.clear ();
+
     bool Start = false;
     char c     = 0;
-    if (fread (&c, sizeof (c), 1, file) != 1) return false;
+    if (fread (&c, sizeof (c), 1, file) != 1) return 0;
 
-    int i = 0;
-    for (; ; i ++)
+    bool seek = false;
+
+    while (true)
     {
-        if (i >= 30) return false;
+        if (!Start)
+        {
+            if (c == '\n' && line != NULL)
+            {
+                (*line) = *line + 1;
+
+                if (spaces != NULL) (*spaces) = 0;
+            }
+            if (c == ' ' && spaces != NULL)
+            {
+                (*spaces) = *spaces + 1;
+            }
+        }
 
         if (Special (c))
         {
-            if (i == 0)
+            if (Word.size () == 0)
             {
-                Word [i] = c;
-
-                i ++;
-
-                Word [i] = 0;
+                Word.push_back (c);
             }
             else
             {
-                fseek (file, -1, SEEK_CUR);
-
-                Word [i] = 0;
+                seek = true;
             }
 
             break;
@@ -116,316 +128,341 @@ bool ReadWord (FILE* file, char Word [])
 
         if (Operator (c))
         {
-            if (i == 0)
+            if (Word.size () == 0)
             {
                 while (Operator (c))
                 {
-                    Word [i] = c;
+                    Word.push_back (c);
 
-                    i ++;
-
-                    if (fread (&c, sizeof (c), 1, file) != 1) break;
+                    if (!fread (&c, sizeof (c), 1, file)) break;
                 }
-
-                fseek (file, -1, SEEK_CUR);
-
-                Word [i] = 0;
-
-                break;
             }
-            else
-            {
-                fseek (file, -1, SEEK_CUR);
 
-                Word [i] = 0;
-            }
+            seek = true;
 
             break;
         }
 
         if (Exept (c))
         {
-           if (Start)
-           {
-               Word [i] = 0;
+            if (Start)
+            {
+                seek = true;
 
-               if (i == 0) return false;
-
-               break;
-           }
-           else i --;
+                break;
+            }
         }
         else
         {
-            if (!Start) Start = true;
-            Word [i] = c;
+            Start = true;
+
+            Word.push_back (c);
         }
 
-        if (fread (&c, sizeof (c), 1, file) != 1)
-        {
-            i ++;
-            Word [i] = 0;
-            break;
-        }
+        if (!fread (&c, sizeof (c), 1, file)) break;
     }
 
-    return i > 0;
+    if (seek) fseek (file, -1, SEEK_CUR);
+
+    return Word.size () > 0;
 }
 
 //==============================================================================
 
-bool TryToKey (char Word [], newNodeData* Data)
+bool TryToKey (string& Word, newNodeData* Data)
 {
-    if (strcmp (Word, "(") == 0)
+    if (Word == "(")
     {
         (*Data).Descriptor = N_OB;
 
         return true;
     }
-    if (strcmp (Word, ")") == 0)
+    if (Word == ")")
     {
         (*Data).Descriptor = N_CB;
 
         return true;
     }
-     if (strcmp (Word, "{") == 0)
+     if (Word == "{")
     {
         (*Data).Descriptor = N_OF;
 
         return true;
     }
-    if (strcmp (Word, "}") == 0)
+    if (Word == "}")
     {
         (*Data).Descriptor = N_CF;
 
         return true;
     }
-    if (strcmp (Word, "[") == 0)
+    if (Word == "[")
     {
         (*Data).Descriptor = N_OS;
 
         return true;
     }
-    if (strcmp (Word, "]") == 0)
+    if (Word == "]")
     {
         (*Data).Descriptor = N_CS;
 
         return true;
     }
 
-    if (strcmp (Word, "new") == 0)
+    if (Word == "new")
     {
         (*Data).Descriptor = N_NEW;
 
         return true;
     }
-    if (strcmp (Word, "native") == 0)
+    if (Word == "native")
     {
         (*Data).Descriptor = N_NATIVE;
 
         return true;
     }
-    if (strcmp (Word, "del") == 0)
+    if (Word == "del")
     {
         (*Data).Descriptor = N_DEL;
 
         return true;
     }
-    if (strcmp (Word, "=") == 0)
+    if (Word == "=")
     {
         (*Data).Descriptor = N_EQ;
 
         return true;
     }
-    if (strcmp (Word, "&") == 0)
+    if (Word == "++")
+    {
+        (*Data).Descriptor = N_INCR;
+
+        return true;
+    }
+    if (Word == "--")
+    {
+        (*Data).Descriptor = N_DECR;
+
+        return true;
+    }
+    if (Word == "+=")
+    {
+        (*Data).Descriptor = N_SUM_EQ;
+
+        return true;
+    }
+    if (Word == "-=")
+    {
+        (*Data).Descriptor = N_SUB_EQ;
+
+        return true;
+    }
+    if (Word == "*=")
+    {
+        (*Data).Descriptor = N_MUL_EQ;
+
+        return true;
+    }
+    if (Word == "/=")
+    {
+        (*Data).Descriptor = N_DIV_EQ;
+
+        return true;
+    }
+    if (Word == "%=")
+    {
+        (*Data).Descriptor = N_MOD_EQ;
+
+        return true;
+    }
+    if (Word == "&")
     {
         (*Data).Descriptor = N_LNK;
 
         return true;
     }
-    if (strcmp (Word, ";") == 0)
+    if (Word == ";")
     {
         (*Data).Descriptor = N_END;
 
         return true;
     }
 
-    if (strcmp (Word, "+") == 0)
+    if (Word == "+")
     {
         (*Data).Descriptor = N_SUM;
 
         return true;
     }
-    if (strcmp (Word, "-") == 0)
+    if (Word == "-")
     {
         (*Data).Descriptor = N_SUB;
 
         return true;
     }
-    if (strcmp (Word, "*") == 0)
+    if (Word == "*")
     {
         (*Data).Descriptor = N_MUL;
 
         return true;
     }
-    if (strcmp (Word, "/") == 0)
+    if (Word == "/")
     {
         (*Data).Descriptor = N_DIV;
 
         return true;
     }
-    if (strcmp (Word, "%") == 0)
+    if (Word == "%")
     {
         (*Data).Descriptor = N_MOD;
 
         return true;
     }
 
-    if (strcmp (Word, "true") == 0)
+    if (Word == "true")
     {
         (*Data).Descriptor = N_TRUE;
 
         return true;
     }
-    if (strcmp (Word, "false") == 0)
+    if (Word == "false")
     {
         (*Data).Descriptor = N_FALSE;
 
         return true;
     }
 
-    if (strcmp (Word, "&&") == 0)
+    if (Word == "&&")
     {
         (*Data).Descriptor = N_AND;
 
         return true;
     }
-    if (strcmp (Word, "||") == 0)
+    if (Word == "||")
     {
         (*Data).Descriptor = N_OR;
 
         return true;
     }
 
-    if (strcmp (Word, "==") == 0)
+    if (Word == "==")
     {
         (*Data).Descriptor = N_OPEQ;
 
         return true;
     }
-    if (strcmp (Word, "!=") == 0)
+    if (Word == "!=")
     {
         (*Data).Descriptor = N_NONEQ;
 
         return true;
     }
-    if (strcmp (Word, "!") == 0)
+    if (Word == "!")
     {
         (*Data).Descriptor = N_NOT;
 
         return true;
     }
-    if (strcmp (Word, ">") == 0)
+    if (Word == ">")
     {
         (*Data).Descriptor = N_MORE;
 
         return true;
     }
-    if (strcmp (Word, "<") == 0)
+    if (Word == "<")
     {
         (*Data).Descriptor = N_LESS;
 
         return true;
     }
-    if (strcmp (Word, ">=") == 0)
+    if (Word == ">=")
     {
         (*Data).Descriptor = N_MREQ;
 
         return true;
     }
-    if (strcmp (Word, "<=") == 0)
+    if (Word == "<=")
     {
         (*Data).Descriptor = N_LSEQ;
 
         return true;
     }
 
-    if (strcmp (Word, "if") == 0)
+    if (Word == "if")
     {
         (*Data).Descriptor = N_IF;
 
         return true;
     }
-    if (strcmp (Word, "else") == 0)
+    if (Word == "else")
     {
         (*Data).Descriptor = N_ELSE;
 
         return true;
     }
 
-    if (strcmp (Word, "while") == 0)
+    if (Word == "while")
     {
         (*Data).Descriptor = N_WHILE;
 
         return true;
     }
 
-    if (strcmp (Word, "for") == 0)
+    if (Word == "for")
     {
         (*Data).Descriptor = N_FOR;
 
         return true;
     }
 
-    if (strcmp (Word, "break") == 0)
+    if (Word == "break")
     {
         (*Data).Descriptor = N_BREAK;
 
         return true;
     }
 
-    if (strcmp (Word, "continue") == 0)
+    if (Word == "continue")
     {
         (*Data).Descriptor = N_CONTINUE;
 
         return true;
     }
 
-    if (strcmp (Word, "return") == 0)
+    if (Word == "return")
     {
         (*Data).Descriptor = N_RETURN;
 
         return true;
     }
 
-    if (strcmp (Word, "echo") == 0)
+    if (Word == "echo")
     {
         (*Data).Descriptor = N_ECHO;
 
         return true;
     }
-    if (strcmp (Word, "get") == 0)
+    if (Word == "get")
     {
         (*Data).Descriptor = N_GET;
 
         return true;
     }
 
-    if (strcmp (Word, ",") == 0)
+    if (Word == ",")
     {
         (*Data).Descriptor = N_LIST;
 
         return true;
     }
 
-    if (strcmp (Word, ":") == 0)
+    if (Word == ":")
     {
         (*Data).Descriptor = N_MARK;
 
         return true;
     }
 
-    if (strcmp (Word, "goto") == 0)
+    if (Word == "goto")
     {
         (*Data).Descriptor = N_GOTO;
 
@@ -435,7 +472,7 @@ bool TryToKey (char Word [], newNodeData* Data)
     return false;
 }
 
-bool TryToNum (char Word [], newNodeData* Data)
+bool TryToNum (string& Word, newNodeData* Data)
 {
     (*Data).Data = 0;
 
@@ -482,12 +519,16 @@ bool TryToNum (char Word [], newNodeData* Data)
 
 void LexemProgram (FILE* file, newVector <newNodeData>& Tokens, int* Size)
 {
-    char Word [30] = "";
+    string Word;
     *Size = 0;
+
+    string currentFile;
+    int line = 1;
+    int spaces = 0;
 
     while (true)
     {
-        if (!ReadWord (file, Word)) break;
+        if (!ReadWord (file, Word, &line, &spaces)) break;
 
         newNodeData Data;
 
@@ -507,9 +548,16 @@ void LexemProgram (FILE* file, newVector <newNodeData>& Tokens, int* Size)
 
             continue;
         }
+        if (Word == "#")
+        {
+            fscanf (file, "%d", &line);
+            ReadWord (file, currentFile);
+
+            continue;
+        }
 
         Tokens [*Size].Descriptor = N_NAME;
-        strcpy (Tokens [*Size].Name, Word);
+        Tokens [*Size].SetName (Word.c_str ());
 
         *Size += 1;
     }

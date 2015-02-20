@@ -11,7 +11,7 @@
 
 struct newShekspearData
 {
-    char FirstPersonName [60];
+    char FirstPersonName  [60];
     char SecondPersonName [60];
     bool SecondPersonExist;
 
@@ -24,7 +24,7 @@ struct newShekspearData
     newCounter Funcs;
 
     bool InFunc;
-    char FunctionName [30];
+    char FunctionName [60];
 
     int Act;
     int Scene;
@@ -50,22 +50,22 @@ bool CreateAll (newTree& Tree, FILE* Program, FILE* ErrorOutput, newTree NumIn, 
 
 void CreateInfo (FILE* Program, newShekspearData& ShData);
 
-void GetInfoAll     (FILE* Program, newShekspearData& ShData, char Str []);
-void GetInfoAllOnce (FILE* Program, newShekspearData& ShData, char Str []);
+void GetInfoAll     (FILE* Program, newShekspearData& ShData, string& Str);
+void GetInfoAllOnce (FILE* Program, newShekspearData& ShData, string& Str);
 
-void GetInfoAct (FILE* Program, newShekspearData& ShData, char Str []);
-void GetInfoScene (FILE* Program, newShekspearData& ShData, char Str []);
+void GetInfoAct (FILE* Program, newShekspearData& ShData, string& Str);
+void GetInfoScene (FILE* Program, newShekspearData& ShData, string& Str);
 
-void GetInfoSpeech (FILE* Program, newShekspearData& ShData, char Str []);
-bool GetInfoPhrase (FILE* Program, newShekspearData& ShData, char Str []);
+void GetInfoSpeech (FILE* Program, newShekspearData& ShData, string& Str);
+bool GetInfoPhrase (FILE* Program, newShekspearData& ShData, string& Str);
 
-void GetInfoStackOp (FILE* Program, newShekspearData& ShData, char Str []);
+void GetInfoStackOp (FILE* Program, newShekspearData& ShData, string& Str);
 
-void GetInfoInOut (FILE* Program, newShekspearData& ShData, char Str []);
+void GetInfoInOut (FILE* Program, newShekspearData& ShData, string& Str);
 
-void GetInfoCallGoto (FILE* Program, newShekspearData& ShData, char Str []);
+void GetInfoCallGoto (FILE* Program, newShekspearData& ShData, string& Str);
 
-void GetInfoIf (FILE* Program, newShekspearData& ShData, char Str []);
+void GetInfoIf (FILE* Program, newShekspearData& ShData, string& Str);
 
 //------------------------------------------------------------------------------
 
@@ -78,32 +78,32 @@ void AddNumInOut (newTree& Tree, newShekspearData& ShData);
 void Add (newTree& Tree);
 void Free (newTree& Tree);
 
-int GetRoman (char Num []);
+int GetRoman (const char Num []);
 
-void GetAll     (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str []);
-void GetAllOnce (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str []);
+void GetAll     (newTree& Tree, FILE* Program, newShekspearData& ShData, string& Str);
+void GetAllOnce (newTree& Tree, FILE* Program, newShekspearData& ShData, string& Str);
 
-void GetAct (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str []);
-void GetScene (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str []);
+void GetAct (newTree& Tree, FILE* Program, newShekspearData& ShData, string& Str);
+void GetScene (newTree& Tree, FILE* Program, newShekspearData& ShData, string& Str);
 
-void GetOnScene (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str []);
+void GetOnScene (newTree& Tree, FILE* Program, newShekspearData& ShData, string& Str);
 
-void GetSpeech (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str []);
-bool GetPhrase (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str []);
+void GetSpeech (newTree& Tree, FILE* Program, newShekspearData& ShData, string& Str);
+bool GetPhrase (newTree& Tree, FILE* Program, newShekspearData& ShData, string& Str);
 
-void GetStackOp (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str []);
-void GetFirstPerson (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str []);
-void GetSecondPerson (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str []);
+void GetStackOp (newTree& Tree, FILE* Program, newShekspearData& ShData, string& Str);
+void GetFirstPerson (newTree& Tree, FILE* Program, newShekspearData& ShData, string& Str);
+void GetSecondPerson (newTree& Tree, FILE* Program, newShekspearData& ShData, string& Str);
 
-void GetInOut (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str []);
+void GetInOut (newTree& Tree, FILE* Program, newShekspearData& ShData, string& Str);
 
-void GetCallGoto (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str []);
+void GetCallGoto (newTree& Tree, FILE* Program, newShekspearData& ShData, string& Str);
 
-void GetIf (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str []);
+void GetIf (newTree& Tree, FILE* Program, newShekspearData& ShData, string& Str);
 
-void GetInstance (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str []);
+void GetInstance (newTree& Tree, FILE* Program, newShekspearData& ShData, string& Str);
 
-void GetEquation (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str []);
+void GetEquation (newTree& Tree, FILE* Program, newShekspearData& ShData, string& Str);
 
 //******************************************************************************
 
@@ -172,7 +172,7 @@ bool CreateAll (newTree& Tree, FILE* Program, FILE* ErrorOutput, newTree NumIn, 
 
 void CreateInfo (FILE* Program, newShekspearData& ShData)
 {
-    char Str [60] = "";
+    string Str;
 
     ReadTo (Program, "\n\n");
 
@@ -182,11 +182,12 @@ void CreateInfo (FILE* Program, newShekspearData& ShData)
     {
         if (!ReadShekspearWord (Program, Str, ShData.Way)) return;
 
-        if (strcmp (Str, "act") == 0) break;
+        if (Str == "act") break;
 
-        if (ShData.Vars.Find (Str)) throw TH_ERROR "Name has been already used (%s)", Str);
-        ShData.Vars.Add (Str);
-        if (!InList ("character", Str, ShData.Way)) throw TH_ERROR "You need use Shekspear's names! (%s - invalid)", Str);
+        if (!InList ("character", Str, ShData.Way)) throw TH_ERROR "You need use Shekspear's names! (%s - invalid)", Str.c_str ());
+        std::replace ( Str.begin(), Str.end(), ' ', '_');
+        if (ShData.Vars.Find (Str.c_str ())) throw TH_ERROR "Name has been already used (%s)", Str.c_str ());
+        ShData.Vars.Add (Str.c_str ());
 
         ReadTo (Program, "\n");
 
@@ -201,7 +202,7 @@ void CreateInfo (FILE* Program, newShekspearData& ShData)
 }
 
 
-void GetInfoAll (FILE* Program, newShekspearData& ShData, char Str [])
+void GetInfoAll (FILE* Program, newShekspearData& ShData, string& Str)
 {
     #ifdef INFO_DEBUG
         printf ("%s: Str = \"%s\"\n", __PRETTY_FUNCTION__, Str);
@@ -219,7 +220,7 @@ void GetInfoAll (FILE* Program, newShekspearData& ShData, char Str [])
     }
 }
 
-void GetInfoAllOnce (FILE* Program, newShekspearData& ShData, char Str [])
+void GetInfoAllOnce (FILE* Program, newShekspearData& ShData, string& Str)
 {
     #ifdef INFO_DEBUG
         printf ("%s: Str = \"%s\"\n", __PRETTY_FUNCTION__, Str);
@@ -228,19 +229,19 @@ void GetInfoAllOnce (FILE* Program, newShekspearData& ShData, char Str [])
         #endif
     #endif
 
-    if (strcmp (Str, "act") == 0)
+    if (Str == "act")
     {
         GetInfoAct (Program, ShData, Str);
 
         return;
     }
-    if (strcmp (Str, "scene") == 0)
+    if (Str == "scene")
     {
         GetInfoScene (Program, ShData, Str);
 
         return;
     }
-    if (strcmp (Str, "[") == 0)
+    if (Str == "[")
     {
         newTree Tree;
         GetOnScene (Tree, Program, ShData, Str);
@@ -249,15 +250,17 @@ void GetInfoAllOnce (FILE* Program, newShekspearData& ShData, char Str [])
     }
     if (InList ("character", Str, ShData.Way))
     {
+        std::replace (Str.begin(), Str.end(), ' ', '_');
+
         GetInfoSpeech (Program, ShData, Str);
 
         return;
     }
 
-    throw TH_ERROR "How interpritate %s?", Str);
+    throw TH_ERROR "How interpritate %s?", Str.c_str ());
 }
 
-void GetInfoAct (FILE* Program, newShekspearData& ShData, char Str [])
+void GetInfoAct (FILE* Program, newShekspearData& ShData, string& Str)
 {
     #ifdef INFO_DEBUG
         printf ("%s: Str = \"%s\"\n", __PRETTY_FUNCTION__, Str);
@@ -266,20 +269,20 @@ void GetInfoAct (FILE* Program, newShekspearData& ShData, char Str [])
         #endif
     #endif
 
-    if (strcmp (Str, "act") == 0)
+    if (Str == "act")
     {
         if (!ReadWord (Program, Str, ShData.Way)) throw TH_ERROR "You forgot act number");
 
-        if (strcmp (Str, "in") == 0)
+        if (Str == "in")
         {
             if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "You forgot place name after in");
             if (!InList ("places", Str, ShData.Way))           throw TH_ERROR "After in you need place name");
 
-            ShData.Funcs.Add (Str);
+            ShData.Funcs.Add (Str.c_str ());
         }
         else
         {
-            ShData.Act = GetRoman (Str);
+            ShData.Act = GetRoman (Str.c_str ());
         }
 
         ReadTo (Program, "\n");
@@ -293,7 +296,7 @@ void GetInfoAct (FILE* Program, newShekspearData& ShData, char Str [])
     throw TH_ERROR "Need \"act\" to init act");
 }
 
-void GetInfoScene (FILE* Program, newShekspearData& ShData, char Str [])
+void GetInfoScene (FILE* Program, newShekspearData& ShData, string& Str)
 {
     #ifdef INFO_DEBUG
         printf ("%s: Str = \"%s\"\n", __PRETTY_FUNCTION__, Str);
@@ -302,18 +305,18 @@ void GetInfoScene (FILE* Program, newShekspearData& ShData, char Str [])
         #endif
     #endif
 
-    if (strcmp (Str, "scene") == 0)
+    if (Str == "scene")
     {
         if (!ReadWord (Program, Str, ShData.Way)) throw TH_ERROR "You forgot scene number or place.");
 
-        if (strcmp (Str, "in") == 0)
+        if (Str == "in")
         {
             if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "You forgot place name after in");
             if (!InList ("places", Str, ShData.Way))           throw TH_ERROR "After in you need place name");
         }
         else
         {
-            ShData.Scene = GetRoman (Str);
+            ShData.Scene = GetRoman (Str.c_str ());
         }
 
         ReadTo (Program, "\n");
@@ -324,7 +327,7 @@ void GetInfoScene (FILE* Program, newShekspearData& ShData, char Str [])
     throw TH_ERROR "Need \"scene\" to init scene");
 }
 
-void GetInfoSpeech (FILE* Program, newShekspearData& ShData, char Str [])
+void GetInfoSpeech (FILE* Program, newShekspearData& ShData, string& Str)
 {
     #ifdef INFO_DEBUG
         printf ("%s: Str = \"%s\"\n", __PRETTY_FUNCTION__, Str);
@@ -333,10 +336,10 @@ void GetInfoSpeech (FILE* Program, newShekspearData& ShData, char Str [])
         #endif
     #endif
 
-    if (!ShData.Vars.Find (Str) && !ShData.Stacks.Find (Str)) throw TH_ERROR "This actor(%s) wasn't planned", Str);
-    if (!ShData.OnScene.Find (Str)) throw TH_ERROR "%s isn't on scene!", Str);
+    if (!ShData.Vars.Find (Str.c_str ()) && !ShData.Stacks.Find (Str.c_str ())) throw TH_ERROR "This actor(%s) wasn't planned", Str.c_str ());
+    if (!ShData.OnScene.Find (Str.c_str ())) throw TH_ERROR "%s isn't on scene!", Str.c_str ());
 
-    strcpy (ShData.FirstPersonName, Str);
+    strcpy (ShData.FirstPersonName, Str.c_str ());
     if (ShData.OnScene.Size_ == 2)
     {
         ShData.SecondPersonExist = true;
@@ -355,7 +358,7 @@ void GetInfoSpeech (FILE* Program, newShekspearData& ShData, char Str [])
     }
 
     if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "Actor don't know, what to do!");
-    if (strcmp (Str, ":") != 0) throw TH_ERROR "Actor can only speech.");
+    if (Str != ":") throw TH_ERROR "Actor can only speech.");
 
     if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "Actor must say something.");
     if (!GetInfoPhrase (Program, ShData, Str)) throw TH_ERROR "Actor must say something.");
@@ -375,7 +378,7 @@ void GetInfoSpeech (FILE* Program, newShekspearData& ShData, char Str [])
     }
 }
 
-bool GetInfoPhrase (FILE* Program, newShekspearData& ShData, char Str [])
+bool GetInfoPhrase (FILE* Program, newShekspearData& ShData, string& Str)
 {
     #ifdef INFO_DEBUG
         printf ("%s: Str = \"%s\"\n", __PRETTY_FUNCTION__, Str);
@@ -384,32 +387,32 @@ bool GetInfoPhrase (FILE* Program, newShekspearData& ShData, char Str [])
         #endif
     #endif
 
-    if (InList ("character", Str, ShData.Way) || strcmp (Str, "[") == 0 || strcmp (Str, "act") == 0 || strcmp (Str, "scene") == 0)
+    if (InList ("character", Str, ShData.Way) || Str == "[" || Str == "act" || Str == "scene")
     {
         return false;
     }
 
-    if (strcmp (Str, "remember") == 0 || strcmp (Str, "recall") == 0)
+    if (Str == "remember" || Str == "recall")
     {
         GetInfoStackOp (Program, ShData, Str);
 
         return true;
     }
-    if (strcmp (Str, "open") == 0 || strcmp (Str, "speak") == 0 || strcmp (Str, "listen") == 0)
+    if (Str == "open" || Str == "speak" || Str == "listen")
     {
         GetInfoInOut (Program, ShData, Str);
 
         return true;
     }
 
-    if (strcmp (Str, "let") == 0 || strcmp (Str, "we") == 0)
+    if (Str == "let" || Str == "we")
     {
         GetInfoCallGoto (Program, ShData, Str);
 
         return true;
     }
 
-    if (strcmp (Str, "if") == 0 || InList ("be", Str, ShData.Way))
+    if (Str == "if" || InList ("be", Str, ShData.Way))
     {
         GetInfoIf (Program, ShData, Str);
 
@@ -424,7 +427,7 @@ bool GetInfoPhrase (FILE* Program, newShekspearData& ShData, char Str [])
     return false;
 }
 
-void GetInfoStackOp (FILE* Program, newShekspearData& ShData, char Str [])
+void GetInfoStackOp (FILE* Program, newShekspearData& ShData, string& Str)
 {
     #ifdef INFO_DEBUG
         printf ("%s: Str = \"%s\"\n", __PRETTY_FUNCTION__, Str);
@@ -433,7 +436,7 @@ void GetInfoStackOp (FILE* Program, newShekspearData& ShData, char Str [])
         #endif
     #endif
 
-    if (strcmp (Str, "remember") == 0 || strcmp (Str, "recall") == 0)
+    if (Str == "remember" || Str == "recall")
     {
         if (!ShData.SecondPersonExist) throw TH_ERROR "Talk to whoom?");
 
@@ -447,7 +450,7 @@ void GetInfoStackOp (FILE* Program, newShekspearData& ShData, char Str [])
     }
 }
 
-void GetInfoInOut (FILE* Program, newShekspearData& ShData, char Str [])
+void GetInfoInOut (FILE* Program, newShekspearData& ShData, string& Str)
 {
     #ifdef INFO_DEBUG
         printf ("%s: Str = \"%s\"\n", __PRETTY_FUNCTION__, Str);
@@ -456,27 +459,27 @@ void GetInfoInOut (FILE* Program, newShekspearData& ShData, char Str [])
         #endif
     #endif
 
-    if (strcmp (Str, "open") == 0)
+    if (Str == "open")
     {
         if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "Open what?");
-        if (!InList ("second_person_possessive", Str, ShData.Way)) throw TH_ERROR "You need possessive word after open", Str);
+        if (!InList ("second_person_possessive", Str, ShData.Way)) throw TH_ERROR "You need possessive word after open", Str.c_str ());
         if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "Open what? Heart? Mind? Eyes?");
 
-        if (strcmp (Str, "heart") == 0)
+        if (Str == "heart")
         {
             ShData.UseNumOut = true;
         }
 
         return;
     }
-    if (strcmp (Str, "listen") == 0)
+    if (Str == "listen")
     {
         if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "Listen what?");
-        if (strcmp (Str, "to") != 0) throw TH_ERROR "Actor can only listen to.");
+        if (Str != "to") throw TH_ERROR "Actor can only listen to.");
         if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "Listen to what?");
-        if (!InList ("second_person_possessive", Str, ShData.Way)) throw TH_ERROR "You need possessive word after speak", Str);
+        if (!InList ("second_person_possessive", Str, ShData.Way)) throw TH_ERROR "You need possessive word after speak", Str.c_str ());
         if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "Listen to what? ");
-        if (strcmp (Str, "heart") != 0) throw TH_ERROR "Actor can only listen to him/her mind");
+        if (Str != "heart") throw TH_ERROR "Actor can only listen to him/her mind");
 
         ShData.UseNumIn = true;
 
@@ -484,7 +487,7 @@ void GetInfoInOut (FILE* Program, newShekspearData& ShData, char Str [])
     }
 }
 
-void GetInfoCallGoto (FILE* Program, newShekspearData& ShData, char Str [])
+void GetInfoCallGoto (FILE* Program, newShekspearData& ShData, string& Str)
 {
     #ifdef INFO_DEBUG
         printf ("%s: Str = \"%s\"\n", __PRETTY_FUNCTION__, Str);
@@ -493,50 +496,58 @@ void GetInfoCallGoto (FILE* Program, newShekspearData& ShData, char Str [])
         #endif
     #endif
 
-    if (strcmp (Str, "let") == 0 || strcmp (Str, "we") == 0)
+    if (Str == "let" || Str == "we")
     {
-        if (strcmp (Str, "let") == 0)
+        if (Str == "let")
         {
             if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "Let whoom?");
-            if (strcmp (Str, "us") != 0) throw TH_ERROR "Maybe you mean \"Let us\"?");
+            if (Str != "us") throw TH_ERROR "Maybe you mean \"Let us\"?");
             if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "Let us do what?");
         }
-        if (strcmp (Str, "we") == 0)
+        if (Str == "we")
         {
             if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "We... what to do?");
-            if (strcmp (Str, "shall") != 0 && strcmp (Str, "must") != 0) throw TH_ERROR "We must or shell?");
+            if (Str != "shall" && Str != "must") throw TH_ERROR "We must or shell?");
             if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "We Must/Shell what?");
         }
 
-        if (strcmp (Str, "back") == 0)
+        if (Str == "back")
         {
             if (!ShData.Funcs.Find (ShData.FunctionName)) ShData.Funcs.Add (ShData.FunctionName);
 
             return;
         }
-        if (strcmp (Str, "return") != 0 && strcmp (Str, "proceed") != 0) throw TH_ERROR "Let us... I think we can only return or proceed");
+        if (Str != "return" && Str != "proceed") throw TH_ERROR "Let us... I think we can only return or proceed");
         if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "And after?");
-        if (strcmp (Str, "to") != 0) throw TH_ERROR "I think we can only proceed/return TO.");
+        if (Str != "to") throw TH_ERROR "I think we can only proceed/return TO.");
         if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "To what?");
         if (InList ("places", Str, ShData.Way))
         {
-             if (!ShData.Funcs.Find (Str) && !ShData.Marks.Find (Str)) ShData.Marks.Add (Str);
+             if (!ShData.Funcs.Find (Str.c_str ()) && !ShData.Marks.Find (Str.c_str ())) ShData.Marks.Add (Str.c_str ());
         }
         else
         {
-            if (strcmp (Str, "scene") == 0)
+            if (Str == "scene")
             {
                 if (!ReadWord (Program, Str, ShData.Way)) throw TH_ERROR "Scene number?");
 
-                sprintf (Str, "%d|%d", ShData.Act, GetRoman (Str));
-                if (!ShData.Marks.Find (Str)) ShData.Marks.Add (Str);
+                char buffer [42] = "";
+                sprintf (buffer, "%d|%d", ShData.Act, GetRoman (Str.c_str ()));
+
+                Str = buffer;
+
+                if (!ShData.Marks.Find (Str.c_str ())) ShData.Marks.Add (Str.c_str ());
             }
-            else if (strcmp (Str, "act") == 0)
+            else if (Str == "act")
             {
                 if (!ReadWord (Program, Str, ShData.Way)) throw TH_ERROR "Act number?");
 
-                sprintf (Str, "%d", GetRoman (Str));
-                if (!ShData.Marks.Find (Str)) ShData.Marks.Add (Str);
+                char buffer [42] = "";
+                sprintf (buffer, "%d", GetRoman (Str.c_str ()));
+
+                Str = buffer;
+
+                if (!ShData.Marks.Find (Str.c_str ())) ShData.Marks.Add (Str.c_str ());
             }
             else throw TH_ERROR "I think, we can only to proceed/return to scene/act");
         }
@@ -545,7 +556,7 @@ void GetInfoCallGoto (FILE* Program, newShekspearData& ShData, char Str [])
     }
 }
 
-void GetInfoIf (FILE* Program, newShekspearData& ShData, char Str [])
+void GetInfoIf (FILE* Program, newShekspearData& ShData, string& Str)
 {
     #ifdef INFO_DEBUG
         printf ("%s: Str = \"%s\"\n", __PRETTY_FUNCTION__, Str);
@@ -556,10 +567,10 @@ void GetInfoIf (FILE* Program, newShekspearData& ShData, char Str [])
 
     ShData.UseStatements = true;
 
-    if (strcmp (Str, "if") == 0)
+    if (Str == "if")
     {
         if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "If - what?");
-        if (strcmp (Str, "so") != 0 && strcmp (Str, "not") != 0) throw TH_ERROR "If %s - I think it's incorrect.", Str);
+        if (Str != "so" && Str != "not") throw TH_ERROR "If %s - I think it's incorrect.", Str.c_str ());
 
         if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "What to do if true/false?");
 
@@ -584,7 +595,7 @@ void CreateTree (newTree& Tree, FILE* Program, newShekspearData& ShData)
     Add (Tree);
     AddNumInOut (Tree, ShData);
 
-    char Str [60] = "";
+    string Str;
 
     if (!ReadShekspearWord (Program, Str, ShData.Way)) return;
 
@@ -795,7 +806,7 @@ void Free (newTree& Tree)
     }
 }
 
-int GetRoman (char Num [])
+int GetRoman (const char Num [])
 {
     const int  ArabArr  [13]    = { 1,   4,   5,   9,    10,  40,   50,  90,   100, 400,  500, 900,  1000};
     const char RomanArr [13][3] = {"i", "iv", "v", "ix", "x", "xl", "l", "xc", "c", "cd", "d", "cm", "m"};
@@ -824,7 +835,7 @@ int GetRoman (char Num [])
     return Result;
 }
 
-void GetAll (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str [])
+void GetAll (newTree& Tree, FILE* Program, newShekspearData& ShData, string& Str)
 {
     #ifdef DEBUG
         printf ("%s: Str = \"%s\"\n", __PRETTY_FUNCTION__, Str);
@@ -858,7 +869,7 @@ void GetAll (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str []
     Tree.PopP ();
 }
 
-void GetAllOnce (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str [])
+void GetAllOnce (newTree& Tree, FILE* Program, newShekspearData& ShData, string& Str)
 {
     #ifdef DEBUG
         printf ("%s: Str = \"%s\"\n", __PRETTY_FUNCTION__, Str);
@@ -870,19 +881,19 @@ void GetAllOnce (newTree& Tree, FILE* Program, newShekspearData& ShData, char St
         #endif
     #endif
 
-    if (strcmp (Str, "act") == 0)
+    if (Str == "act")
     {
         GetAct (Tree, Program, ShData, Str);
 
         return;
     }
-    if (strcmp (Str, "scene") == 0)
+    if (Str == "scene")
     {
         GetScene (Tree, Program, ShData, Str);
 
         return;
     }
-    if (strcmp (Str, "[") == 0)
+    if (Str == "[")
     {
         GetOnScene (Tree, Program, ShData, Str);
 
@@ -890,15 +901,16 @@ void GetAllOnce (newTree& Tree, FILE* Program, newShekspearData& ShData, char St
     }
     if (InList ("character", Str, ShData.Way))
     {
+        std::replace (Str.begin(), Str.end(), ' ', '_');
         GetSpeech (Tree, Program, ShData, Str);
 
         return;
     }
 
-    throw TH_ERROR "How interpritate %s?", Str);
+    throw TH_ERROR "How interpritate %s?", Str.c_str ());
 }
 
-void GetAct (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str [])
+void GetAct (newTree& Tree, FILE* Program, newShekspearData& ShData, string& Str)
 {
     #ifdef DEBUG
         printf ("%s: Str = \"%s\"\n", __PRETTY_FUNCTION__, Str);
@@ -910,11 +922,11 @@ void GetAct (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str []
         #endif
     #endif
 
-    if (strcmp (Str, "act") == 0)
+    if (Str == "act")
     {
         if (!ReadWord (Program, Str, ShData.Way)) throw TH_ERROR "You forgot act number or name");
 
-        if (strcmp (Str, "in") == 0)
+        if (Str == "in")
         {
             if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "You forgot place name after in");
             if (!InList ("places", Str, ShData.Way))           throw TH_ERROR "After in you need place name");
@@ -933,7 +945,7 @@ void GetAct (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str []
              Tree.Set (newNodeData (N_NEW));
              Tree.DownL ();
               newNodeData Data = newNodeData (N_FUN);
-              strcpy (Data.Name, Str);
+              strcpy (Data.Name, Str.c_str ());
               Tree.Set (Data);
              Tree.Up ();
             Tree.Up ();
@@ -955,13 +967,15 @@ void GetAct (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str []
 
             Tree.Up ();
 
-            sprintf (Str, "%d", ShData.Act);
-            if (ShData.Marks.Find (Str))
+            char buffer [21];
+            sprintf (buffer, "%d", ShData.Act);
+            Str = buffer;
+            if (ShData.Marks.Find (Str.c_str ()))
             {
                 Tree.DownR ();
 
                 Data = newNodeData (N_MARK);
-                strcpy (Data.Name, Str);
+                strcpy (Data.Name, Str.c_str ());
                 Tree.Set (Data);
 
                 Tree.Up ();
@@ -975,7 +989,7 @@ void GetAct (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str []
             return;
         }
 
-        ShData.Act = GetRoman (Str);
+        ShData.Act = GetRoman (Str.c_str ());
 
         ReadTo (Program, "\n");
 
@@ -989,11 +1003,13 @@ void GetAct (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str []
             return;
         }
 
-        sprintf (Str, "%d", ShData.Act);
-        if (ShData.Marks.Find (Str))
+        char buffer [21];
+        sprintf (buffer, "%d", ShData.Act);
+        Str = buffer;
+        if (ShData.Marks.Find (Str.c_str ()))
         {
             newNodeData Data = newNodeData (N_MARK);
-            strcpy (Data.Name, Str);
+            strcpy (Data.Name, Str.c_str ());
             Tree.Set (Data);
         }
 
@@ -1003,7 +1019,7 @@ void GetAct (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str []
     throw TH_ERROR "Need \"act\" to init act");
 }
 
-void GetScene (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str [])
+void GetScene (newTree& Tree, FILE* Program, newShekspearData& ShData, string& Str)
 {
     #ifdef DEBUG
         printf ("%s: Str = \"%s\"\n", __PRETTY_FUNCTION__, Str);
@@ -1015,34 +1031,37 @@ void GetScene (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str 
         #endif
     #endif
 
-    if (strcmp (Str, "scene") == 0)
+    if (Str == "scene")
     {
         if (!ReadWord (Program, Str, ShData.Way)) throw TH_ERROR "You forgot scene number or place.");
 
-        if (strcmp (Str, "in") == 0)
+        if (Str == "in")
         {
             if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "You forgot place name after in");
             if (!InList ("places", Str, ShData.Way))           throw TH_ERROR "After in you need place name");
 
             ReadTo (Program, "\n");
 
-            if (ShData.Marks.Find (Str))
+            if (ShData.Marks.Find (Str.c_str ()))
             {
                 newNodeData Data = newNodeData (N_MARK);
-                strcpy (Data.Name, Str);
+                strcpy (Data.Name, Str.c_str ());
                 Tree.Set (Data);
             }
 
             return;
         }
 
-        ShData.Scene = GetRoman (Str);
+        ShData.Scene = GetRoman (Str.c_str ());
 
-        sprintf (Str, "%d|%d", ShData.Act, ShData.Scene);
-        if (ShData.Marks.Find (Str))
+        char buffer [42] = "";
+        sprintf (buffer, "%d|%d", ShData.Act, ShData.Scene);
+        Str = buffer;
+
+        if (ShData.Marks.Find (Str.c_str ()))
         {
             newNodeData Data = newNodeData (N_MARK);
-            strcpy (Data.Name, Str);
+            strcpy (Data.Name, Str.c_str ());
             Tree.Set (Data);
         }
 
@@ -1054,7 +1073,7 @@ void GetScene (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str 
     throw TH_ERROR "Need \"scene\" to init scene");
 }
 
-void GetOnScene (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str [])
+void GetOnScene (newTree& Tree, FILE* Program, newShekspearData& ShData, string& Str)
 {
     #ifdef DEBUG
         printf ("%s: Str = \"%s\"\n", __PRETTY_FUNCTION__, Str);
@@ -1068,27 +1087,30 @@ void GetOnScene (newTree& Tree, FILE* Program, newShekspearData& ShData, char St
 
     if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "You forgot what to do actors after [!");
 
-    if (strcmp (Str, "enter") == 0)
+    if (Str == "enter")
     {
         if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "You forgot, who enter!");
+        std::replace (Str.begin(), Str.end(), ' ', '_');
 
-        if (strcmp (Str, "]") == 0) throw TH_ERROR "You forgot, who enter(not [enter])!");
+        if (Str == "]") throw TH_ERROR "You forgot, who enter(not [enter])!");
 
-        if (!ShData.Vars.Find (Str) && !ShData.Stacks.Find (Str)) throw TH_ERROR "Enter unknown actor %s!", Str);
-        if (ShData.OnScene.Find (Str)) throw TH_ERROR "%s is already on scene!", Str);
-        ShData.OnScene.Add (Str);
+        if (!ShData.Vars.Find (Str.c_str ()) && !ShData.Stacks.Find (Str.c_str ())) throw TH_ERROR "Enter unknown actor %s!", Str.c_str ());
+        if (ShData.OnScene.Find (Str.c_str ())) throw TH_ERROR "%s is already on scene!", Str.c_str ());
+        ShData.OnScene.Add (Str.c_str ());
 
         if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "You forgot at least ] after enter actor's name!");
 
-        while (strcmp (Str, "]") != 0)
+        while (Str != "]")
         {
-            if (strcmp (Str, "and") != 0) throw TH_ERROR "Need and betwen actors!");
+            if (Str != "and") throw TH_ERROR "Need and betwen actors!");
 
             if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "And what after and?");
 
-            if (!ShData.Vars.Find (Str) && !ShData.Stacks.Find (Str)) throw TH_ERROR "Enter unknown actor %s!", Str);
-            if (ShData.OnScene.Find (Str)) throw TH_ERROR "%s is already on scene!", Str);
-            ShData.OnScene.Add (Str);
+            std::replace (Str.begin(), Str.end(), ' ', '_');
+
+            if (!ShData.Vars.Find (Str.c_str ()) && !ShData.Stacks.Find (Str.c_str ())) throw TH_ERROR "Enter unknown actor %s!", Str.c_str ());
+            if (ShData.OnScene.Find (Str.c_str ())) throw TH_ERROR "%s is already on scene!", Str.c_str ());
+            ShData.OnScene.Add (Str.c_str ());
 
             if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "You forgot at least ] after enter actor's name!");
         }
@@ -1096,27 +1118,31 @@ void GetOnScene (newTree& Tree, FILE* Program, newShekspearData& ShData, char St
         return ;
     }
 
-    if (strcmp (Str, "exit") == 0)
+    if (Str == "exit")
     {
         if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "You forgot, who exit!");
 
-        if (strcmp (Str, "]") == 0) throw TH_ERROR "You forgot, who exit(not [exit])!");
+        std::replace (Str.begin(), Str.end(), ' ', '_');
 
-        if (!ShData.Vars.Find (Str) && !ShData.Stacks.Find (Str)) throw TH_ERROR "Exit unknown actor %s!", Str);
-        if (!ShData.OnScene.Find (Str)) throw TH_ERROR "%s isn't on scene!", Str);
-        ShData.OnScene.Rem (Str);
+        if (Str == "]") throw TH_ERROR "You forgot, who exit(not [exit])!");
+
+        if (!ShData.Vars.Find (Str.c_str ()) && !ShData.Stacks.Find (Str.c_str ())) throw TH_ERROR "Exit unknown actor %s!", Str.c_str ());
+        if (!ShData.OnScene.Find (Str.c_str ())) throw TH_ERROR "%s isn't on scene!", Str.c_str ());
+        ShData.OnScene.Rem (Str.c_str ());
 
         if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "You forgot at least ] after exit actor's name!");
 
-        while (strcmp (Str, "]") != 0)
+        while (Str != "]")
         {
-            if (strcmp (Str, "and") != 0) throw TH_ERROR "Need and betwen actors!");
+            if (Str != "and") throw TH_ERROR "Need and betwen actors!");
 
             if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "And what after and?");
 
-            if (!ShData.Vars.Find (Str) && !ShData.Stacks.Find (Str)) throw TH_ERROR "Exit unknown actor %s!", Str);
-            if (!ShData.OnScene.Find (Str)) throw TH_ERROR "%s isn't on scene!", Str);
-            ShData.OnScene.Rem (Str);
+            std::replace (Str.begin(), Str.end(), ' ', '_');
+
+            if (!ShData.Vars.Find (Str.c_str ()) && !ShData.Stacks.Find (Str.c_str ())) throw TH_ERROR "Exit unknown actor %s!", Str.c_str ());
+            if (!ShData.OnScene.Find (Str.c_str ())) throw TH_ERROR "%s isn't on scene!", Str.c_str ());
+            ShData.OnScene.Rem (Str.c_str ());
 
             if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "You forgot at least ] after enter actor's name!");
         }
@@ -1124,32 +1150,36 @@ void GetOnScene (newTree& Tree, FILE* Program, newShekspearData& ShData, char St
         return ;
     }
 
-    if (strcmp (Str, "exeunt") == 0)
+    if (Str == "exeunt")
     {
         if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "You forgot, who exeunt!");
 
-        if (strcmp (Str, "]") == 0)
+        std::replace (Str.begin(), Str.end(), ' ', '_');
+
+        if (Str == "]")
         {
             ShData.OnScene.Empty ();
 
             return ;
         }
 
-        if (!ShData.Vars.Find (Str) && !ShData.Stacks.Find (Str)) throw TH_ERROR "Exeunt unknown actor %s!", Str);
-        if (!ShData.OnScene.Find (Str)) throw TH_ERROR "%s isn't on scene!", Str);
-        ShData.OnScene.Rem (Str);
+        if (!ShData.Vars.Find (Str.c_str ()) && !ShData.Stacks.Find (Str.c_str ())) throw TH_ERROR "Exeunt unknown actor %s!", Str.c_str ());
+        if (!ShData.OnScene.Find (Str.c_str ())) throw TH_ERROR "%s isn't on scene!", Str.c_str ());
+        ShData.OnScene.Rem (Str.c_str ());
 
         if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "You forgot at least ] after exeunt actor's name!");
 
-        while (strcmp (Str, "]") != 0)
+        while (Str != "]")
         {
-            if (strcmp (Str, "and") != 0) throw TH_ERROR "Need and betwen actors!");
+            if (Str != "and") throw TH_ERROR "Need and betwen actors!");
 
             if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "And what after and?");
 
-            if (!ShData.Vars.Find (Str) && !ShData.Stacks.Find (Str)) throw TH_ERROR "Exeunt unknown actor %s!", Str);
-            if (!ShData.OnScene.Find (Str)) throw TH_ERROR "%s isn't on scene!", Str);
-            ShData.OnScene.Rem (Str);
+            std::replace (Str.begin(), Str.end(), ' ', '_');
+
+            if (!ShData.Vars.Find (Str.c_str ()) && !ShData.Stacks.Find (Str.c_str ())) throw TH_ERROR "Exeunt unknown actor %s!", Str.c_str ());
+            if (!ShData.OnScene.Find (Str.c_str ())) throw TH_ERROR "%s isn't on scene!", Str.c_str ());
+            ShData.OnScene.Rem (Str.c_str ());
 
             if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "You forgot at least ] after enter actor's name!");
         }
@@ -1157,12 +1187,12 @@ void GetOnScene (newTree& Tree, FILE* Program, newShekspearData& ShData, char St
         return ;
     }
 
-    if (strcmp (Str, "]") == 0) return ;
+    if (Str == "]") return ;
 
     throw TH_ERROR "Actors don't know, what to do");
 }
 
-void GetSpeech (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str [])
+void GetSpeech (newTree& Tree, FILE* Program, newShekspearData& ShData, string& Str)
 {
     #ifdef DEBUG
         printf ("%s: Str = \"%s\"\n", __PRETTY_FUNCTION__, Str);
@@ -1174,10 +1204,10 @@ void GetSpeech (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str
         #endif
     #endif
 
-    if (!ShData.Vars.Find (Str) && !ShData.Stacks.Find (Str)) throw TH_ERROR "This actor(%s) wasn't planned", Str);
-    if (!ShData.OnScene.Find (Str)) throw TH_ERROR "%s isn't on scene!", Str);
+    if (!ShData.Vars.Find (Str.c_str ()) && !ShData.Stacks.Find (Str.c_str ())) throw TH_ERROR "This actor(%s) wasn't planned", Str.c_str ());
+    if (!ShData.OnScene.Find (Str.c_str ())) throw TH_ERROR "%s isn't on scene!", Str.c_str ());
 
-    strcpy (ShData.FirstPersonName, Str);
+    strcpy (ShData.FirstPersonName, Str.c_str ());
     if (ShData.OnScene.Size_ == 2)
     {
         ShData.SecondPersonExist = true;
@@ -1196,7 +1226,7 @@ void GetSpeech (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str
     }
 
     if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "Actor don't know, what to do!");
-    if (strcmp (Str, ":") != 0) throw TH_ERROR "Actor can only speech.");
+    if (Str != ":") throw TH_ERROR "Actor can only speech.");
 
     Tree.PushP ();
 
@@ -1226,7 +1256,7 @@ void GetSpeech (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str
     Tree.PopP ();
 }
 
-bool GetPhrase (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str [])
+bool GetPhrase (newTree& Tree, FILE* Program, newShekspearData& ShData, string& Str)
 {
     #ifdef DEBUG
         printf ("%s: Str = \"%s\"\n", __PRETTY_FUNCTION__, Str);
@@ -1238,32 +1268,32 @@ bool GetPhrase (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str
         #endif
     #endif
 
-    if (InList ("character", Str, ShData.Way) || strcmp (Str, "[") == 0 || strcmp (Str, "act") == 0 || strcmp (Str, "scene") == 0)
+    if (InList ("character", Str, ShData.Way) || Str == "[" || Str == "act" || Str == "scene")
     {
         return false;
     }
 
-    if (strcmp (Str, "remember") == 0 || strcmp (Str, "recall") == 0)
+    if (Str == "remember" || Str == "recall")
     {
         GetStackOp (Tree, Program, ShData, Str);
 
         return true;
     }
-    if (strcmp (Str, "open") == 0 || strcmp (Str, "speak") == 0 || strcmp (Str, "listen") == 0)
+    if (Str == "open" || Str == "speak" || Str == "listen")
     {
         GetInOut (Tree, Program, ShData, Str);
 
         return true;
     }
 
-    if (strcmp (Str, "let") == 0 || strcmp (Str, "we") == 0)
+    if (Str == "let" || Str == "we")
     {
         GetCallGoto (Tree, Program, ShData, Str);
 
         return true;
     }
 
-    if (strcmp (Str, "if") == 0 || InList ("be", Str, ShData.Way))
+    if (Str == "if" || InList ("be", Str, ShData.Way))
     {
         GetIf (Tree, Program, ShData, Str);
 
@@ -1277,11 +1307,11 @@ bool GetPhrase (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str
         return true;
     }
 
-    throw TH_ERROR "Program exeption unknown word %s", Str);
+    throw TH_ERROR "Program exeption unknown word %s", Str.c_str ());
     return false;
 }
 
-void GetStackOp (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str [])
+void GetStackOp (newTree& Tree, FILE* Program, newShekspearData& ShData, string& Str)
 {
     #ifdef DEBUG
         printf ("%s: Str = \"%s\"\n", __PRETTY_FUNCTION__, Str);
@@ -1293,7 +1323,7 @@ void GetStackOp (newTree& Tree, FILE* Program, newShekspearData& ShData, char St
         #endif
     #endif
 
-    if (strcmp (Str, "remember") == 0 || strcmp (Str, "recall") == 0)
+    if (Str == "remember" || Str == "recall")
     {
         if (!ShData.SecondPersonExist) throw TH_ERROR "Talk to whoom?");
 
@@ -1301,11 +1331,11 @@ void GetStackOp (newTree& Tree, FILE* Program, newShekspearData& ShData, char St
 
         newNodeData Data;
 
-        if (strcmp (Str, "remember") == 0) Tree.DownL ();
+        if (Str == "remember") Tree.DownL ();
         else                               Tree.DownR ();
 
         Tree.Set (newNodeData (N_EQ));
-        if (strcmp (Str, "remember") == 0) Tree.DownL ();
+        if (Str == "remember") Tree.DownL ();
         else                               Tree.DownR ();
          Data.Descriptor = N_ARR;
          strcpy (Data.Name, ShData.SecondPersonName);
@@ -1317,9 +1347,9 @@ void GetStackOp (newTree& Tree, FILE* Program, newShekspearData& ShData, char St
           Tree.Up ();
          Tree.Up ();
         Tree.Up ();
-        if (strcmp (Str, "remember") == 0) Tree.DownR ();
+        if (Str == "remember") Tree.DownR ();
         else                               Tree.DownL ();
-         if (strcmp (Str, "remember") == 0)
+         if (Str == "remember")
          {
              GetFirstPerson (Tree, Program, ShData, Str);
          }
@@ -1331,7 +1361,7 @@ void GetStackOp (newTree& Tree, FILE* Program, newShekspearData& ShData, char St
 
         Tree.Up ();
 
-        if (strcmp (Str, "remember") == 0) Tree.DownR ();
+        if (Str == "remember") Tree.DownR ();
         else                               Tree.DownL ();
 
         Tree.Set (newNodeData (N_EQ));
@@ -1342,7 +1372,7 @@ void GetStackOp (newTree& Tree, FILE* Program, newShekspearData& ShData, char St
          Tree.Up ();
         Tree.Up ();
         Tree.DownR ();
-         if (strcmp (Str, "remember") == 0) Tree.Set (newNodeData (N_SUM));
+         if (Str == "remember") Tree.Set (newNodeData (N_SUM));
          else                               Tree.Set (newNodeData (N_SUB));
          Tree.DownL ();
           Tree.Set (Data);
@@ -1361,7 +1391,7 @@ void GetStackOp (newTree& Tree, FILE* Program, newShekspearData& ShData, char St
     }
 }
 
-void GetFirstPerson (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str [])
+void GetFirstPerson (newTree& Tree, FILE* Program, newShekspearData& ShData, string& Str)
 {
     #ifdef DEBUG
         printf ("%s: Str = \"%s\"\n", __PRETTY_FUNCTION__, Str);
@@ -1391,7 +1421,7 @@ void GetFirstPerson (newTree& Tree, FILE* Program, newShekspearData& ShData, cha
     }
     else throw TH_ERROR "Who are %s?", ShData.FirstPersonName);
 }
-void GetSecondPerson (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str [])
+void GetSecondPerson (newTree& Tree, FILE* Program, newShekspearData& ShData, string& Str)
 {
     #ifdef DEBUG
         printf ("%s: Str = \"%s\"\n", __PRETTY_FUNCTION__, Str);
@@ -1424,7 +1454,7 @@ void GetSecondPerson (newTree& Tree, FILE* Program, newShekspearData& ShData, ch
     else throw TH_ERROR "Who are %s?", ShData.SecondPersonName);
 }
 
-void GetInOut (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str [])
+void GetInOut (newTree& Tree, FILE* Program, newShekspearData& ShData, string& Str)
 {
     #ifdef DEBUG
         printf ("%s: Str = \"%s\"\n", __PRETTY_FUNCTION__, Str);
@@ -1436,13 +1466,13 @@ void GetInOut (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str 
         #endif
     #endif
 
-    if (strcmp (Str, "open") == 0)
+    if (Str == "open")
     {
         if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "Open what?");
-        if (!InList ("second_person_possessive", Str, ShData.Way)) throw TH_ERROR "You need possessive word after open", Str);
+        if (!InList ("second_person_possessive", Str, ShData.Way)) throw TH_ERROR "You need possessive word after open", Str.c_str ());
         if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "Open what? Heart? Mind? Eyes?");
 
-        if (strcmp (Str, "heart") == 0)
+        if (Str == "heart")
         {
             newNodeData Data = newNodeData (N_FUN);
             strcpy (Data.Name, "NumOut");
@@ -1451,7 +1481,7 @@ void GetInOut (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str 
             GetSecondPerson (Tree, Program, ShData, Str);
             Tree.Up ();
         }
-        else if (strcmp (Str, "mind") == 0)
+        else if (Str == "mind")
         {
             Tree.Set (newNodeData (N_GET));
             Tree.DownL ();
@@ -1462,12 +1492,12 @@ void GetInOut (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str 
 
         return;
     }
-    if (strcmp (Str, "speak") == 0)
+    if (Str == "speak")
     {
         if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "Speak what?");
-        if (!InList ("second_person_possessive", Str, ShData.Way)) throw TH_ERROR "You need possessive word after speak", Str);
+        if (!InList ("second_person_possessive", Str, ShData.Way)) throw TH_ERROR "You need possessive word after speak", Str.c_str ());
         if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "Speak what? Speech?");
-        if (strcmp (Str, "mind") != 0) throw TH_ERROR "Actor can only speak him/her mind");
+        if (Str != "mind") throw TH_ERROR "Actor can only speak him/her mind");
 
         Tree.Set (newNodeData (N_ECHO));
         Tree.DownL ();
@@ -1476,14 +1506,14 @@ void GetInOut (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str 
 
         return;
     }
-    if (strcmp (Str, "listen") == 0)
+    if (Str == "listen")
     {
         if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "Listen what?");
-        if (strcmp (Str, "to") != 0) throw TH_ERROR "Actor can only listen to.");
+        if (Str != "to") throw TH_ERROR "Actor can only listen to.");
         if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "Listen to what?");
-        if (!InList ("second_person_possessive", Str, ShData.Way)) throw TH_ERROR "You need possessive word after speak", Str);
+        if (!InList ("second_person_possessive", Str, ShData.Way)) throw TH_ERROR "You need possessive word after speak", Str.c_str ());
         if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "Listen to what? ");
-        if (strcmp (Str, "heart") != 0) throw TH_ERROR "Actor can only listen to him/her mind");
+        if (Str != "heart") throw TH_ERROR "Actor can only listen to him/her mind");
 
         newNodeData Data = newNodeData (N_FUN);
         strcpy (Data.Name, "NumIn");
@@ -1499,7 +1529,7 @@ void GetInOut (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str 
     }
 }
 
-void GetCallGoto (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str [])
+void GetCallGoto (newTree& Tree, FILE* Program, newShekspearData& ShData, string& Str)
 {
     #ifdef DEBUG
         printf ("%s: Str = \"%s\"\n", __PRETTY_FUNCTION__, Str);
@@ -1511,22 +1541,22 @@ void GetCallGoto (newTree& Tree, FILE* Program, newShekspearData& ShData, char S
         #endif
     #endif
 
-    if (strcmp (Str, "let") == 0 || strcmp (Str, "we") == 0)
+    if (Str == "let" || Str == "we")
     {
-        if (strcmp (Str, "let") == 0)
+        if (Str == "let")
         {
             if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "Let whoom?");
-            if (strcmp (Str, "us") != 0) throw TH_ERROR "Maybe you mean \"Let us\"?");
+            if (Str != "us") throw TH_ERROR "Maybe you mean \"Let us\"?");
             if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "Let us do what?");
         }
-        if (strcmp (Str, "we") == 0)
+        if (Str == "we")
         {
             if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "We... what to do?");
-            if (strcmp (Str, "shall") != 0 && strcmp (Str, "must") != 0) throw TH_ERROR "We must or shell?");
+            if (Str != "shall" && Str != "must") throw TH_ERROR "We must or shell?");
             if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "We Must/Shell what?");
         }
 
-        if (strcmp (Str, "back") == 0)
+        if (Str == "back")
         {
             if (!ShData.InFunc) throw TH_ERROR "You can return only in function");
 
@@ -1537,42 +1567,42 @@ void GetCallGoto (newTree& Tree, FILE* Program, newShekspearData& ShData, char S
 
             return;
         }
-        if (strcmp (Str, "return") != 0 && strcmp (Str, "proceed") != 0) throw TH_ERROR "Let us... I think we can only return or proceed");
+        if (Str != "return" && Str != "proceed") throw TH_ERROR "Let us... I think we can only return or proceed");
         if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "And after?");
-        if (strcmp (Str, "to") != 0) throw TH_ERROR "I think we can only proceed/return TO.");
+        if (Str != "to") throw TH_ERROR "I think we can only proceed/return TO.");
         if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "To what?");
         if (InList ("places", Str, ShData.Way))
         {
-             if (ShData.Funcs.Find (Str))
+             if (ShData.Funcs.Find (Str.c_str ()))
              {
                  newNodeData Data = newNodeData (N_FUN);
-                 strcpy (Data.Name, Str);
+                 strcpy (Data.Name, Str.c_str ());
                  Tree.Set (Data);
              }
-             else if (ShData.Marks.Find (Str))
+             else if (ShData.Marks.Find (Str.c_str ()))
              {
                  newNodeData Data = newNodeData (N_GOTO);
-                 strcpy (Data.Name, Str);
+                 strcpy (Data.Name, Str.c_str ());
                  Tree.Set (Data);
              }
-             else throw TH_ERROR "Act/scene %s wasn't declared", Str);
+             else throw TH_ERROR "Act/scene %s wasn't declared", Str.c_str ());
         }
         else
         {
-            if (strcmp (Str, "scene") == 0)
+            if (Str == "scene")
             {
                 if (!ReadWord (Program, Str, ShData.Way)) throw TH_ERROR "Scene number?");
 
                 newNodeData Data = newNodeData (N_GOTO);
-                sprintf (Data.Name, "%d|%d", ShData.Act, GetRoman (Str));
+                sprintf (Data.Name, "%d|%d", ShData.Act, GetRoman (Str.c_str ()));
                 Tree.Set (Data);
             }
-            else if (strcmp (Str, "act") == 0)
+            else if (Str == "act")
             {
                 if (!ReadWord (Program, Str, ShData.Way)) throw TH_ERROR "Act number?");
 
                 newNodeData Data = newNodeData (N_GOTO);
-                sprintf (Data.Name, "%d", GetRoman (Str));
+                sprintf (Data.Name, "%d", GetRoman (Str.c_str ()));
                 Tree.Set (Data);
             }
             else throw TH_ERROR "I think, we can only to proceed/return to scene/act");
@@ -1582,7 +1612,7 @@ void GetCallGoto (newTree& Tree, FILE* Program, newShekspearData& ShData, char S
     }
 }
 
-void GetIf (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str [])
+void GetIf (newTree& Tree, FILE* Program, newShekspearData& ShData, string& Str)
 {
     #ifdef DEBUG
         printf ("%s: Str = \"%s\"\n", __PRETTY_FUNCTION__, Str);
@@ -1613,15 +1643,15 @@ void GetIf (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str [])
         Tree.Up ();
 
         if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "And what?");
-        bool Not = strcmp (Str, "not") == 0;
+        bool Not = Str == "not";
         if (Not && !ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "Not what?");
 
-        if (strcmp (Str, "as") == 0)
+        if (Str == "as")
         {
             if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "As... what?");
-            if (!InList ("positive_adjective", Str, ShData.Way) && !InList ("neutral_adjective", Str, ShData.Way) && !InList ("negative_adjective", Str, ShData.Way)) throw TH_ERROR "I think as %s as - is incorrect.", Str);
+            if (!InList ("positive_adjective", Str, ShData.Way) && !InList ("neutral_adjective", Str, ShData.Way) && !InList ("negative_adjective", Str, ShData.Way)) throw TH_ERROR "I think as %s as - is incorrect.", Str.c_str ());
             if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "As adj... and after?");
-            if (strcmp (Str, "as") != 0) throw TH_ERROR "Need as after adjective");
+            if (Str != "as") throw TH_ERROR "Need as after adjective");
 
             if (!Not) Tree.Set (newNodeData (N_OPEQ));
             else      Tree.Set (newNodeData (N_NONEQ));
@@ -1629,7 +1659,7 @@ void GetIf (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str [])
         else if (InList ("positive_comparative", Str, ShData.Way))
         {
             if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "Than who/what?");
-            if (strcmp (Str, "than") != 0) throw TH_ERROR "Only than is correct.");
+            if (Str != "than") throw TH_ERROR "Only than is correct.");
 
             if (!Not) Tree.Set (newNodeData (N_MORE));
             else      Tree.Set (newNodeData (N_LESS));
@@ -1637,12 +1667,12 @@ void GetIf (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str [])
         else if (InList ("negative_comparative", Str, ShData.Way))
         {
             if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "Than who/what?");
-            if (strcmp (Str, "than") != 0) throw TH_ERROR "Only than is correct.");
+            if (Str != "than") throw TH_ERROR "Only than is correct.");
 
             if (!Not) Tree.Set (newNodeData (N_LESS));
             else      Tree.Set (newNodeData (N_MORE));
         }
-        else throw TH_ERROR "Unknown compare %s", Str);
+        else throw TH_ERROR "Unknown compare %s", Str.c_str ());
 
         Tree.DownR ();
         if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "and what?");
@@ -1654,12 +1684,12 @@ void GetIf (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str [])
         return;
     }
 
-    if (strcmp (Str, "if") == 0)
+    if (Str == "if")
     {
         newNodeData Data;
 
         if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "If - what?");
-        if (strcmp (Str, "so") != 0 && strcmp (Str, "not") != 0) throw TH_ERROR "If %s - I think it's incorrect.", Str);
+        if (Str != "so" && Str != "not") throw TH_ERROR "If %s - I think it's incorrect.", Str.c_str ());
 
         Tree.Set (newNodeData (N_IF));
         Tree.DownL ();
@@ -1667,7 +1697,7 @@ void GetIf (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str [])
         Data.Descriptor = N_VAR;
         strcpy (Data.Name, "StatVar");
 
-        if (strcmp (Str, "not") == 0)
+        if (Str == "not")
         {
             Tree.Set (newNodeData (N_NOT));
             Tree.DownL ();
@@ -1687,7 +1717,7 @@ void GetIf (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str [])
     }
 }
 
-void GetInstance (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str [])
+void GetInstance (newTree& Tree, FILE* Program, newShekspearData& ShData, string& Str)
 {
     #ifdef DEBUG
         printf ("%s: Str = \"%s\"\n", __PRETTY_FUNCTION__, Str);
@@ -1699,40 +1729,40 @@ void GetInstance (newTree& Tree, FILE* Program, newShekspearData& ShData, char S
         #endif
     #endif
 
-    if (strcmp (Str, "sum") == 0 || strcmp (Str, "difference") == 0 || strcmp (Str, "product") == 0 || strcmp (Str, "quotient") == 0 || strcmp (Str, "remainder") == 0)
+    if (Str == "sum" || Str == "difference" || Str == "product" || Str == "quotient" || Str == "remainder")
     {
-        if (strcmp (Str, "sum") == 0)
+        if (Str == "sum")
         {
-            if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "%s what?", Str);
-            if (strcmp (Str, "of") != 0) throw TH_ERROR "After sum you need \"of\"");
+            if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "%s what?", Str.c_str ());
+            if (Str != "of") throw TH_ERROR "After sum you need \"of\"");
             Tree.Set (newNodeData (N_SUM));
         }
-        if (strcmp (Str, "difference") == 0)
+        if (Str == "difference")
         {
-            if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "%s what?", Str);
-            if (strcmp (Str, "between") != 0) throw TH_ERROR "After difference you need \"between\"");
+            if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "%s what?", Str.c_str ());
+            if (Str != "between") throw TH_ERROR "After difference you need \"between\"");
             Tree.Set (newNodeData (N_SUB));
         }
-        if (strcmp (Str, "product") == 0)
+        if (Str == "product")
         {
-            if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "%s what?", Str);
-            if (strcmp (Str, "of") != 0) throw TH_ERROR "After product you need \"of\"");
+            if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "%s what?", Str.c_str ());
+            if (Str != "of") throw TH_ERROR "After product you need \"of\"");
             Tree.Set (newNodeData (N_MUL));
         }
-        if (strcmp (Str, "quotient") == 0)
+        if (Str == "quotient")
         {
-            if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "%s what?", Str);
-            if (strcmp (Str, "between") != 0) throw TH_ERROR "After quotient you need \"between\"");
+            if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "%s what?", Str.c_str ());
+            if (Str != "between") throw TH_ERROR "After quotient you need \"between\"");
             Tree.Set (newNodeData (N_DIV));
         }
-        if (strcmp (Str, "remainder") == 0)
+        if (Str == "remainder")
         {
-            if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "%s what?", Str);
-            if (strcmp (Str, "of") != 0) throw TH_ERROR "After remainder you need \"of\"");
-            if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "%s of what?", Str);
-            if (strcmp (Str, "quotient") != 0) throw TH_ERROR "After remainder of you need \"quotient\"");
-            if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "%s what?", Str);
-            if (strcmp (Str, "between") != 0) throw TH_ERROR "After quotient you need \"between\"");
+            if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "%s what?", Str.c_str ());
+            if (Str != "of") throw TH_ERROR "After remainder you need \"of\"");
+            if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "%s of what?", Str.c_str ());
+            if (Str != "quotient") throw TH_ERROR "After remainder of you need \"quotient\"");
+            if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "%s what?", Str.c_str ());
+            if (Str != "between") throw TH_ERROR "After quotient you need \"between\"");
             Tree.Set (newNodeData (N_MOD));
         }
 
@@ -1742,7 +1772,7 @@ void GetInstance (newTree& Tree, FILE* Program, newShekspearData& ShData, char S
         Tree.Up ();
 
         if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "And what?");
-        if (strcmp (Str, "and") != 0) throw TH_ERROR "You need \"and\"");
+        if (Str != "and") throw TH_ERROR "You need \"and\"");
 
         Tree.DownR ();
         if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "What?");
@@ -1752,7 +1782,7 @@ void GetInstance (newTree& Tree, FILE* Program, newShekspearData& ShData, char S
         return;
     }
 
-    if (strcmp (Str, "twice") == 0)
+    if (Str == "twice")
     {
         Tree.Set (newNodeData (N_MUL));
         Tree.DownL ();
@@ -1766,11 +1796,11 @@ void GetInstance (newTree& Tree, FILE* Program, newShekspearData& ShData, char S
         return;
     }
 
-    if (strcmp (Str, "square") == 0 || strcmp (Str, "cube") == 0)
+    if (Str == "square" || Str == "cube")
     {
-        bool Square = strcmp (Str, "square") == 0;
+        bool Square = Str == "square";
         if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "square/cube - and what? Potato!");
-        if (strcmp (Str, "of") != 0) throw TH_ERROR "You need \"of\" after square/cube");
+        if (Str != "of") throw TH_ERROR "You need \"of\" after square/cube");
 
         newTree Branch;
         if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "Of what?");
@@ -1804,7 +1834,7 @@ void GetInstance (newTree& Tree, FILE* Program, newShekspearData& ShData, char S
     {
         int CopyP = ftell (Program);
 
-        if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "%s - who/what?", Str);
+        if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "%s - who/what?", Str.c_str ());
 
         int i = 1;
         while (InList ("positive_adjective", Str, ShData.Way) || InList ("neutral_adjective", Str, ShData.Way) || InList ("negative_adjective", Str, ShData.Way))
@@ -1812,7 +1842,7 @@ void GetInstance (newTree& Tree, FILE* Program, newShekspearData& ShData, char S
             i ++;
 
             CopyP = ftell (Program);
-            if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "%s - who/what?", Str);
+            if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "%s - who/what?", Str.c_str ());
         }
 
         fseek (Program, CopyP, 0);
@@ -1872,18 +1902,18 @@ void GetInstance (newTree& Tree, FILE* Program, newShekspearData& ShData, char S
         return;
     }
 
-    if (ShData.Vars.Find (Str))
+    if (ShData.Vars.Find (Str.c_str ()))
     {
         newNodeData Data = newNodeData (N_VAR);
-        strcpy (Data.Name, Str);
+        strcpy (Data.Name, Str.c_str ());
         Tree.Set (Data);
 
         return;
     }
-    if (ShData.Stacks.Find (Str))
+    if (ShData.Stacks.Find (Str.c_str ()))
     {
         newNodeData Data = newNodeData (N_ARR);
-        strcpy (Data.Name, Str);
+        strcpy (Data.Name, Str.c_str ());
         Tree.Set (Data);
 
         Tree.DownL();
@@ -1893,10 +1923,10 @@ void GetInstance (newTree& Tree, FILE* Program, newShekspearData& ShData, char S
         return;
     }
 
-    throw TH_ERROR "%s - I don't think it's correct.", Str);
+    throw TH_ERROR "%s - I don't think it's correct.", Str.c_str ());
 }
 
-void GetEquation (newTree& Tree, FILE* Program, newShekspearData& ShData, char Str [])
+void GetEquation (newTree& Tree, FILE* Program, newShekspearData& ShData, string& Str)
 {
     #ifdef DEBUG
         printf ("%s: Str = \"%s\"\n", __PRETTY_FUNCTION__, Str);
@@ -1920,11 +1950,11 @@ void GetEquation (newTree& Tree, FILE* Program, newShekspearData& ShData, char S
         if (InList ("be", Str, ShData.Way))
         {
             if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "As?");
-            if (strcmp (Str, "as") != 0) throw TH_ERROR "Only ~be?");
+            if (Str != "as") throw TH_ERROR "Only ~be?");
             if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "As... And what?");
-            if (!InList ("positive_adjective", Str, ShData.Way) && !InList ("neutral_adjective", Str, ShData.Way) && !InList ("negative_adjective", Str, ShData.Way)) throw TH_ERROR "As %s as - I think, it's incorrect.", Str);
+            if (!InList ("positive_adjective", Str, ShData.Way) && !InList ("neutral_adjective", Str, ShData.Way) && !InList ("negative_adjective", Str, ShData.Way)) throw TH_ERROR "As %s as - I think, it's incorrect.", Str.c_str ());
             if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "Sudden end after as adjective");
-            if (strcmp (Str, "as") != 0) throw TH_ERROR "as adj %s - I think, it's incorrect.", Str);
+            if (Str != "as") throw TH_ERROR "as adj %s - I think, it's incorrect.", Str.c_str ());
             if (!ReadShekspearWord (Program, Str, ShData.Way)) throw TH_ERROR "As adj as... and what?");
         }
 

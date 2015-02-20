@@ -1,3 +1,3 @@
-..\Processor\Processor.exe %1
+..\Processor\Processor.exe -i %1 -insp TEST.txt
 pause
 exit

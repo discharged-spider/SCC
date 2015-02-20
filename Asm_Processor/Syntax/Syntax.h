@@ -3,21 +3,37 @@
 
 namespace Syntax
 {
-    const int  ComandNumber                                   = 27;
-    const int  ComandMaxSize                                  = 7;
+    const int JIT_MODE  = 'J' + 'I' + 'T';
+    const int PROC_MODE = 'P' + 'R' + 'O' + 'C';
 
-    struct NewComand
+    const int  CommandsNumber = 0
+        #define COMMAND_DEF(NUM, NAME, STR, DESCRIPTOR, PARAMS, CODE) + 1
+        #include "CommandDef.h"
+        #undef COMMAND_DEF
+    ;
+
+
+    const int  CommandMaxSize = 7;
+
+    enum COMMANDS
+    {
+        #define COMMAND_DEF(NUM, NAME, STR, DESCRIPTOR, PARAMS, CODE) NAME = DESCRIPTOR,
+        #include "CommandDef.h"
+        #undef COMMAND_DEF
+    };
+
+    struct NewCommand
     {
         const char* Name;
         const int   Descriptor;
         const int   Params;
     };
 
-    const NewComand Comands [ComandNumber] =
+    const NewCommand Commands [CommandsNumber] =
     {
-        #define COMAND_DEF(NUM, NAME, DESCRIPTOR, PARAMS, CODE) {NAME, DESCRIPTOR, PARAMS},
-        #include "ComandDef.h"
-        #undef COMAND_DEF
+        #define COMMAND_DEF(NUM, NAME, STR, DESCRIPTOR, PARAMS, CODE) {STR, DESCRIPTOR, PARAMS},
+        #include "CommandDef.h"
+        #undef COMMAND_DEF
     };
 }
 

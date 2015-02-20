@@ -1,5 +1,5 @@
 #define PROGRAM_NAME "SCC_Tree_Print"
-#define TREE_VERSION 9
+#define TREE_VERSION 10
 #define BeautifulDot
 #define __DOT__ "PLEASE_DONT_USE"
 
@@ -130,11 +130,12 @@ int main (int ArgN, char** ARG)
 
         if (!ErrorOutput) ErrorOutput = fopen ("Error.txt", "ab");
         fprintf (ErrorOutput, "%s", Error.ErrorText_);
+        fclose (ErrorOutput);
     }
     catch (...)
     {
         printf ("I don't know, what they said!");
     }
 
-    _fcloseall ();
+    //_fcloseall ();
 }

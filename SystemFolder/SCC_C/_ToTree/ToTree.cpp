@@ -1,5 +1,5 @@
 #define PROGRAM_NAME "SCC_C_To_Tree"
-#define TREE_VERSION 9
+#define TREE_VERSION 10
 /**/
 #include "windows.h"
 #include "Recursia.h"
@@ -103,6 +103,7 @@ int main (int ArgN, char** ARG)
 
         if (!ErrorOutput) ErrorOutput = fopen ("Error.txt", "ab");
         fprintf (ErrorOutput, "%s", Error.ErrorText_);
+        fclose (ErrorOutput);
     }
     catch (...)
     {
@@ -110,5 +111,5 @@ int main (int ArgN, char** ARG)
     }
 
     remove ("Program.scc_pre_c");
-    _fcloseall ();
+    //_fcloseall ();
 }

@@ -1,5 +1,5 @@
 #define PROGRAM_NAME "SCC_Tree_To_Asm"
-#define TREE_VERSION 9
+#define TREE_VERSION 10
 /**/
 #include "TreeToMyAsm.h"
 
@@ -15,6 +15,7 @@ int main (int ArgN, char** ARG)
         printf ("-ii input_info_name (default = \"Info.scc_tree_info\")\n");
         printf ("-o output_file_name (default = \"Program.scc_asm\")\n");
         printf ("-e error_output_file_name (default = \"Error.txt\")\n");
+        printf ("-insp - to enable vars and arrs get/set logging (disabled by default)\n");
         exit (0);
     }
 
@@ -26,6 +27,8 @@ int main (int ArgN, char** ARG)
     FILE* InputInfo = NULL;
     FILE* Output = NULL;
     FILE* ErrorOutput = NULL;
+
+    bool UseInspector = false;
 
     try
     {
@@ -63,6 +66,10 @@ int main (int ArgN, char** ARG)
                 if (ErrorOutput) fclose (ErrorOutput);
                 ErrorOutput = fopen (ARG[i], "ab");
             }
+            if (strcmp (ARG[i], "-insp") == 0)
+            {
+                UseInspector = true;
+            }
         }
 
         if (!Input) Input = fopen ("Tree.scc_tree", "rb");
@@ -86,7 +93,7 @@ int main (int ArgN, char** ARG)
         ReadInfoFile (Info, NodeInfo, InputInfo);
         fclose (InputInfo);
 
-        CreateAsm (Output, Tree, Info, NodeInfo);
+        CreateAsm (Output, Tree, Info, NodeInfo, UseInspector);
         fclose (Output);
 
         fclose (ErrorOutput);
@@ -97,11 +104,12 @@ int main (int ArgN, char** ARG)
 
         if (!ErrorOutput) ErrorOutput = fopen ("Error.txt", "ab");
         fprintf (ErrorOutput, "%s", Error.ErrorText_);
+        fclose (ErrorOutput);
     }
     catch (...)
     {
         printf ("Unknown error");
     }
 
-    _fcloseall ();
+    //_fcloseall ();
 }
