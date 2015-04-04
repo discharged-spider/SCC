@@ -1,0 +1,98 @@
+//Assuming that DESC and BASE_DESC defined by user
+
+//USEFULL: #define BASE_DESC(NAME, STR) DESC (NAME, STR)
+
+#ifndef DESC
+  #define DESC(NAME, STR)
+#endif
+
+#ifndef BASE_DESC
+  #define BASE_DESC(NAME, STR)
+#endif
+
+#define NDSC(NAME) DESC(N_##NAME, #NAME)
+
+NDSC (HAI)
+NDSC (KTHXBYE)
+NDSC (OF)
+
+NDSC (BOTH)
+NDSC (AN)
+NDSC (SAEM)
+NDSC (THS)
+NDSC (THN)
+
+NDSC (I)
+NDSC (A)
+NDSC (IZ)
+NDSC (YR)
+NDSC (MKAY)
+
+NDSC (HAS)
+NDSC (ITZ)
+NDSC (HOW)
+
+NDSC (NVR)
+NDSC (MND)
+
+NDSC (U)
+NDSC (CAN)
+NDSC (SO)
+
+NDSC (IM)
+NDSC (IN)
+NDSC (OUTTA)
+
+NDSC (FOUND)
+NDSC (GTFOHR)
+
+NDSC (O)DESC (N_RLY_Q, "RLY?")
+NDSC (YA)
+NDSC (RLY)
+NDSC (NO)
+NDSC (WAI)
+NDSC (OIC)
+
+#define FBD(STR, NAME) BASE_DESC (N_##NAME, #STR)
+
+FBD (WIN, TRUE)
+FBD (FAIL, FALSE)
+
+FBD (EITHER, OR)
+FBD (NOT, NOT)
+FBD (DIFFRINT, NONEQ)
+FBD (MRE, MORE)
+FBD (LSE, LESS)
+
+FBD (SUM, SUM)
+FBD (DIFF, SUB)
+FBD (PRODUKT, MUL)
+FBD (QUOSHUNT, DIV)
+FBD (MOD, MOD)
+
+FBD (VISIBLE, ECHO)
+FBD (GIMMEH, GET)
+
+FBD (HR, MARK)
+FBD (GT, GOTO)
+
+FBD (FGT, DEL)
+
+FBD (R, EQ)
+
+FBD (IF, IF)
+
+FBD (WILE, WHILE)
+FBD (GTFOHR, BREAK)
+
+FBD (GTFO, RETURN)
+
+#undef NDSC
+
+#ifdef DESC
+  #undef DESC
+#endif
+
+#ifdef BASE_DESC
+  #undef BASE_DESC
+#endif

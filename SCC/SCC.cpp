@@ -10,7 +10,7 @@
 
 #include "..\\SystemFolder\\_SystemLibs\\ConsoleApp\\ConsoleApp.h"
 
-const int TypesNumber = 5;
+const int TypesNumber = 6;
 
 enum SCC_TYPES
 {
@@ -18,6 +18,7 @@ enum SCC_TYPES
     SCC_ASM,
     SCC_NEW_ASM,
     SCC_SPL,
+    SCC_LOL,
     SCC_TREE
 };
 
@@ -41,9 +42,9 @@ int main (int ArgN, char** ARG)
         printf ("%s help.\n", PROGRAM_NAME);
         printf ("Arguments:\n");
         printf ("input_file_name\n");
-        printf ("-i [-scc_c || -scc_spl] /*input type*/\n");
+        printf ("-i [-scc_c || -scc_spl || -scc_lol] /*input type*/\n");
         printf ("-o output_file_name (default = \"Output.txt\")\n");
-        printf ("-m [-scc_c || -scc_asm || -scc_new_asm || -scc_spl] /*output type*/\n");
+        printf ("-m [-scc_c || -scc_asm || -scc_new_asm || -scc_spl || -scc_lol] /*output type*/\n");
         printf ("-e error_output_file_name (default = \"Error.txt\")\n");
         printf ("-no - non optimaze (don't use optimizator) \n");
         printf ("-fp[ PARAMETERS ] - front-end parameters\n");
@@ -230,10 +231,10 @@ bool CheckModules (string Way)
 
 int GetType (const char File [])
 {
-    int  TypesID    [TypesNumber]     = {SCC_C,   SCC_ASM,   SCC_NEW_ASM,   SCC_TREE,   SCC_SPL};
-    //                                    scc_c    scc_asm   scc_new_asm    scc_tree    scc_spl
-    char TypesNames [TypesNumber][30] = {"c_ccs", "msa_ccs", "msa_wen_ccs", "eert_ccs", "lps_ccs"};
-    bool Match      [TypesNumber]     = {true,    true,      true,         true,       true};
+    int  TypesID    [TypesNumber]     = {SCC_C,   SCC_ASM,   SCC_NEW_ASM,   SCC_TREE,   SCC_SPL,   SCC_LOL};
+    //                                    scc_c    scc_asm   scc_new_asm    scc_tree    scc_spl    scc_lol
+    char TypesNames [TypesNumber][30] = {"c_ccs", "msa_ccs", "msa_wen_ccs", "eert_ccs", "lps_ccs", "lol_ccs"};
+    bool Match      [TypesNumber]     = {true,    true,      true,         true,       true,     true};
 
     int Return = -1;
 
@@ -283,6 +284,12 @@ string ComandFileToTree (int From, const char FromName [], const char ToName [],
         case (SCC_SPL):
         {
             Comand += "SCC_Spl";
+
+            break;
+        }
+        case (SCC_LOL):
+        {
+            Comand += "SCC_Lol";
 
             break;
         }
@@ -375,6 +382,12 @@ string ComandTreeToFile (int To, const char FromName [], const char FromInfoName
         case (SCC_SPL):
         {
             Comand += "SCC_Spl";
+
+            break;
+        }
+        case (SCC_LOL):
+        {
+            Comand += "SCC_Lol";
 
             break;
         }

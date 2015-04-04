@@ -228,7 +228,7 @@ void LinkNode (newTree& Tree, newTreeInfo& Info, newVector <newNodeInfo>& NodeIn
     }
     if (Data.Descriptor == N_DEL)
     {
-        if (FunMID.InFunc == false) throw TH_ERROR "Can't delete global values");
+        //if (FunMID.InFunc == false) throw TH_ERROR "Can't delete global values");
 
         State = 2;
         if (Tree.CanDownL ())

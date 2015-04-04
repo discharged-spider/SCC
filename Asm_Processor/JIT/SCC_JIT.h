@@ -163,8 +163,6 @@ void InitFPU (vector<unsigned char>& Output, unsigned int* OutputSize)
 
     FCLEX
 
-    return;
-
     /*
     Set FPU control word (for right %):
 

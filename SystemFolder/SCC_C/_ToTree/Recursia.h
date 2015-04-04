@@ -1061,7 +1061,7 @@ void GetBB (newTree& Tree, newNodeData Program [], int& Size, int& i)
 
         i ++;
 
-        if (Program [i].Descriptor == N_EQ)
+        if (i < Size && Program [i].Descriptor == N_EQ)
         {
             i ++;
 

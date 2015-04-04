@@ -17,13 +17,22 @@ const int WINDOW_SX = 800, WINDOW_SY = 600;
 const int SW_SX = 600, SW_SY = 400;
 const int SW_X  = 100, SW_Y  = 100;
 
+bool DEBUG_MODE = false;
+
 struct agent_t
 {
-     string name;
+    bool disqualified;
 
-     vector <int> data;
+    string name;
 
-     COLORREF color;
+    vector <int> data;
+
+    COLORREF color;
+
+    agent_t ()
+    {
+        disqualified = false;
+    }
 };
 
 int test (vector <agent_t>& agents, int max_n, string Way);
@@ -64,6 +73,19 @@ int main (int ArgN, char** ARG)
 
         for (int i = 1; i < ArgN; i ++)
         {
+            if (strcmp (ARG [i], "-d") == 0)
+            {
+                DEBUG_MODE = true;
+
+                continue;
+            }
+            if (strcmp (ARG [i], "-r") == 0)
+            {
+                srand (time (NULL));
+
+                continue;
+            }
+
             agent_t temp;
             temp.name = ARG [i];
 
@@ -77,7 +99,7 @@ int main (int ArgN, char** ARG)
 
         if (!ErrorOutput) ErrorOutput = fopen ("Error.txt", "ab");
 
-         txCreateWindow (WINDOW_SX, WINDOW_SY);
+        txCreateWindow (WINDOW_SX, WINDOW_SY);
 
         const int N = 40;
 
@@ -175,7 +197,21 @@ int test (vector <agent_t>& agents, int max_n, string Way)
 
             if (agents [an].data [n - 1] != 0)
             {
-                printf ("Error! (%s)\n", agents [an].name.c_str ());
+                if (DEBUG_MODE)
+                {
+                    printf ("Error! (%s)\n", agents [an].name.c_str ());
+
+                    printf ("Blank answer:\n");
+
+                    for (int i = 0; i < test.size (); i ++)
+                    {
+                        printf ("%d ", test [i]);
+                    }
+
+                    exit (0);
+                }
+
+                agents [an].disqualified = true;
 
                 continue;
             }
@@ -352,8 +388,12 @@ void draw (vector <agent_t>& agents)
 
     for (int i = 0; i < agents.size (); i ++)
     {
+        string output = agents [i].name;
+
+        if (agents [i].disqualified) output += " (banned)";
+
         txSetColor (agents [i].color);
-        txTextOut (0, i * (FONT_SIZE + 1), agents [i].name.c_str ());
+        txTextOut (0, i * (FONT_SIZE + 1), output.c_str ());
     }
 }
 

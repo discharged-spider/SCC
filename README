@@ -14,6 +14,7 @@ Languages:
 SCC_C - C-like script language
 SCC_ASM - Asm
 SCC_Shakespeare - Shakespeare modificaton, look documentation
+SCC_Lolcode - Lolcode modificaton, look documentation
 
 Processors:
 scc_exe files - for soft-processor

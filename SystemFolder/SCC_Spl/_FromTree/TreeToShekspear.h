@@ -113,6 +113,9 @@ void PopParams (FILE* To, newTree& Tree, newTreeInfo& Info, newVector <newNodeIn
 
 void CreateShekspear (FILE* To, newTree& Tree, newTreeInfo Info, newVector <newNodeInfo> NodeInfo, string Way)
 {
+    if (Info.ArrNumber > 0) throw TH_ERROR "Arrs not support, sorry. :(");
+    if (Info.UseNatives) throw TH_ERROR "Use natives?");
+
     newTreeToShekspearData ShData;
     ShData.CurrentSpeaker = -1;
 
